@@ -20,7 +20,7 @@
             --success: #12B76A; --danger: #F04438; --r: 12px;
         }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-1); margin: 0; padding: 12px; padding-bottom: 50px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-1); margin: 0; padding: 12px; padding-bottom: 60px; }
         .layout { display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
         
         /* CARD & HEADER */
@@ -49,7 +49,7 @@
         .btn-del-mini { border:none; background:none; color:#98A2B3; padding: 4px; font-size:14px; }
         .acc-tot { padding: 8px; text-align: right; font-weight: 700; font-size: 12px; background: #F9FAFB; border-top: 1px solid var(--border); }
 
-        /* FORMULARIO GESTIÓN */
+        /* FORMULARIO */
         .form-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
         .form-col { flex: 1; min-width: 0; }
         .form-fixed { width: 100px; flex-shrink: 0; }
@@ -63,17 +63,16 @@
         .btn-main { background: var(--text-1); color: white; border: none; width: 100%; border-radius: 8px; font-weight: 600; height: 44px; margin-top: 6px; font-size: 14px; }
         .btn-cancel { background: #FFF; color: var(--text-1); border: 1px solid var(--border); margin-top: 8px; }
         
-        /* BOTONES DE GESTIÓN DE LISTA (BASURA) */
         .manage-group { display: flex; gap: 6px; }
         .btn-trash-list { width: 40px; height: 40px; border: 1px solid #FECDCA; background: #FEF3F2; color: var(--danger); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         
-        /* TOAST */
         #toast { visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; z-index: 99; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 13px; }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* EXTRAS */
-        .tools { display: flex; gap: 8px; margin-top: 15px; }
-        .btn-tool { flex: 1; height: 36px; background: white; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .tools { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-tool { flex: 1; height: 36px; background: white; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 600; min-width: 80px; }
+        .btn-danger-tool { flex: 1; height: 36px; background: #FEF3F2; color: var(--danger); border: 1px solid #FECDCA; border-radius: 8px; font-size: 12px; font-weight: 600; min-width: 80px; }
+
         .list-view { display: none; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; font-size: 10px; color: #667085; padding: 8px; border-bottom: 1px solid var(--border); }
@@ -110,7 +109,6 @@
 
     <div class="card">
         <button onclick="toggleView()" id="btnSwitch" style="width:100%; border:none; background:transparent; color:var(--primary); font-weight:600; font-size:12px; cursor:pointer;">Cambiar Vista</button>
-        
         <div id="view-acc" class="acc-view">
             <div class="acc-col">
                 <div class="acc-head inc">INGRESOS</div>
@@ -123,7 +121,6 @@
                 <div class="acc-tot" id="tot-exp" style="color:var(--danger)">$0</div>
             </div>
         </div>
-
         <div id="view-list" class="list-view">
             <table><thead><tr><th>Fecha</th><th>Concepto</th><th style="text-align:right">Monto</th></tr></thead><tbody id="list-table"></tbody></table>
         </div>
@@ -148,6 +145,7 @@
                 </div>
                 <div class="form-col"><input type="number" id="amount" placeholder="$0.00" required step="0.01" style="font-weight:700"></div>
             </div>
+            
             <label>Categoría:</label>
             <div class="form-row">
                 <div class="form-col manage-group">
@@ -172,12 +170,13 @@
     </div>
 
     <div class="card">
-        <h3 style="margin:0 0 10px 0; font-size:12px; color:#667085;">ANÁLISIS</h3>
+        <h3 style="margin:0 0 10px 0; font-size:12px; color:#667085;">CONFIG & BACKUP</h3>
         <div style="height:180px"><canvas id="chart"></canvas></div>
         <div class="tools">
-            <button class="btn-tool" onclick="dl()">Descargar Datos</button>
+            <button class="btn-tool" onclick="dl()">Descargar</button>
             <input type="file" id="ul" style="display:none" onchange="ul(this)">
-            <button class="btn-tool" onclick="document.getElementById('ul').click()">Cargar Datos</button>
+            <button class="btn-tool" onclick="document.getElementById('ul').click()">Restaurar</button>
+            <button class="btn-danger-tool" onclick="resetConfig()">Reset Config</button>
         </div>
     </div>
 </div>
@@ -185,26 +184,40 @@
 <div id="toast">Notificación</div>
 
 <script>
-    // --- DATOS INICIALES ---
     const def = { cats: { income: ["Ingresos"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] }, cons: { "Ingresos":["Sueldo"], "Esenciales":["Alquiler","Super"], "Deudas":["Tarjeta"], "Varios":["Salidas"], "Ahorro":["USD"] } };
-    let appData = JSON.parse(localStorage.getItem('appData_v8')) || def;
+    
+    // --- LECTURA SEGURA DE DATOS ---
+    let appData = JSON.parse(localStorage.getItem('appData_v8'));
+    // Validación de integridad: Si los datos están rotos, usar default
+    if (!appData || !appData.cats || !appData.cons) {
+        console.log("Datos corruptos o nuevos, usando default");
+        appData = def;
+        localStorage.setItem('appData_v8', JSON.stringify(appData));
+    }
+
     let transactions = JSON.parse(localStorage.getItem('transactions_v4')) || [];
     let editingId = null;
     let isAccView = true;
 
-    // --- INICIO ---
     window.onload = () => {
         const t = new Date();
         document.getElementById('date').value = t.toISOString().split('T')[0];
         document.getElementById('currentMonth').value = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
-        upCat(); load();
+        // Forzar recarga de menús al inicio
+        setTimeout(() => { upCat(); load(); }, 100); 
     };
 
-    // --- LÓGICA DE LISTAS (CASCADA) ---
+    // --- FUNCIONES BLINDADAS PARA DESPLEGABLES ---
     function upCat() {
-        const t = document.getElementById('type').value, s = document.getElementById('category'); s.innerHTML='';
-        let c = t==='income'?appData.cats.income:appData.cats.expense;
-        // Ordenar y llenar
+        const t = document.getElementById('type').value;
+        const s = document.getElementById('category'); 
+        s.innerHTML='';
+        
+        let c = t==='income' ? appData.cats.income : appData.cats.expense;
+        
+        // Protección extra: si c es undefined, iniciarlo vacio
+        if(!c) c = [];
+
         [...c].sort().forEach(x=>s.add(new Option(x,x))); 
         s.add(new Option('➕ Otro...','Otro')); 
         upCon();
@@ -215,19 +228,21 @@
         const s = document.getElementById('conceptSelect'); 
         s.innerHTML='';
         
-        // Manejo de "Otro" en Categoría
         if(c==='Otro') {
             document.getElementById('customCat').style.display='block';
-            s.add(new Option('➕ Otro...','Otro')); // Si es cat nueva, obligamos a concepto nuevo
-            hCon();
-            return;
+            s.add(new Option('➕ Otro...','Otro'));
+            hCon(); return;
         } else {
             document.getElementById('customCat').style.display='none';
         }
 
-        // Si la categoría existe, buscamos sus conceptos
+        // Protección extra: validar si existe la lista
         let list = appData.cons[c];
-        if(!list) { list = []; appData.cons[c] = []; } // Protección contra nulos
+        if(!list) { 
+            // Si la categoría existe pero no tiene conceptos, inicializar lista vacia
+            appData.cons[c] = []; 
+            list = [];
+        }
 
         [...list].sort().forEach(x=>s.add(new Option(x,x))); 
         s.add(new Option('➕ Otro...','Otro'));
@@ -238,74 +253,64 @@
         document.getElementById('customCon').style.display = document.getElementById('conceptSelect').value==='Otro'?'block':'none'; 
     }
 
-    // --- LÓGICA DE GESTIÓN (BORRAR ITEMS DE LA LISTA) ---
+    // --- FUNCIONES DE BORRADO ---
     function delItem(level) {
         if(level === 'cat') {
             const val = document.getElementById('category').value;
-            if(val === 'Otro') return showToast("No puedes borrar 'Otro'");
-            if(confirm(`¿Eliminar la categoría "${val}" y sus conceptos para siempre?`)) {
+            if(val === 'Otro') return showToast("No se puede borrar 'Otro'");
+            if(confirm(`¿Borrar categoría "${val}"?`)) {
                 const t = document.getElementById('type').value;
                 if(t === 'income') appData.cats.income = appData.cats.income.filter(x => x !== val);
                 else appData.cats.expense = appData.cats.expense.filter(x => x !== val);
                 delete appData.cons[val];
-                saveApp(); upCat(); showToast("Categoría eliminada");
+                saveApp(); upCat(); showToast("Borrada");
             }
         } else {
             const val = document.getElementById('conceptSelect').value;
             const cat = document.getElementById('category').value;
-            if(val === 'Otro') return showToast("No puedes borrar 'Otro'");
-            if(confirm(`¿Eliminar el concepto "${val}" de la lista?`)) {
+            if(val === 'Otro') return showToast("No se puede borrar 'Otro'");
+            if(confirm(`¿Borrar concepto "${val}"?`)) {
                 appData.cons[cat] = appData.cons[cat].filter(x => x !== val);
-                saveApp(); upCon(); showToast("Concepto eliminado");
+                saveApp(); upCon(); showToast("Borrado");
             }
         }
     }
 
-    // --- GUARDAR MOVIMIENTO ---
+    // --- RESTO DE LÓGICA ---
     document.getElementById('form').onsubmit = (e) => {
         e.preventDefault();
         const type=document.getElementById('type').value, amt=document.getElementById('amount').value, date=document.getElementById('date').value;
         let cat=document.getElementById('category').value, con=document.getElementById('conceptSelect').value;
         
-        // LOGICA DE "OTRO" (AGREGAR NUEVOS)
         if(cat==='Otro'){ 
             cat=document.getElementById('customCat').value.trim(); 
-            if(!cat) return showToast("Escribe una categoría");
+            if(!cat) return showToast("Falta categoría");
             if(type==='income'){ if(!appData.cats.income.includes(cat)) appData.cats.income.push(cat); }
             else { if(!appData.cats.expense.includes(cat)) appData.cats.expense.push(cat); }
             if(!appData.cons[cat]) appData.cons[cat]=[]; 
         }
-        
         if(con==='Otro'){ 
             con=document.getElementById('customCon').value.trim();
-            if(!con) return showToast("Escribe un concepto");
+            if(!con) return showToast("Falta concepto");
             if(!appData.cons[cat].includes(con)) appData.cons[cat].push(con);
         }
-        
-        saveApp(); // Guardar cambios en listas
-
+        saveApp();
         const tr = { id: editingId||Date.now(), date: date, monthKey: date.slice(0,7), text: con, category: cat, amount: type==='expense'?-Math.abs(amt):Math.abs(amt), executed: document.getElementById('executed').checked };
-        
         if(editingId){ transactions[transactions.findIndex(x=>x.id===editingId)]=tr; showToast("Actualizado"); cancelEdit(); } 
         else { transactions.push(tr); showToast("Guardado"); }
-        
         saveTrans(); load();
     };
 
-    // --- RENDERIZADO ---
     function load() {
         const mk = document.getElementById('currentMonth').value;
         const d = new Date(mk+'-02');
         document.getElementById('monthLabel').innerText = d.toLocaleString('es',{month:'short',year:'numeric'}).toUpperCase();
-        
         let f = transactions.filter(t=>t.monthKey===mk).sort((a,b)=>new Date(a.date)-new Date(b.date));
-        
         const inc = f.reduce((s,t)=>t.amount>0?s+t.amount:s,0);
         const exp = f.reduce((s,t)=>t.amount<0?s+Math.abs(t.amount):s,0);
         document.getElementById('val-bal').innerText = `$${(inc-exp).toLocaleString()}`;
         const dol = parseFloat(document.getElementById('manualDolar').value)||1;
         document.getElementById('val-usd').innerText = `US$ ${((inc-exp)/dol).toFixed(2)}`;
-
         if(isAccView) renderAcc(f); else renderList(f);
         drawChart(f, inc, exp);
     }
@@ -313,18 +318,8 @@
     function renderAcc(f) {
         const li = document.getElementById('list-inc'), le = document.getElementById('list-exp');
         li.innerHTML=''; le.innerHTML='';
-        
         f.forEach(t => {
-            const html = `<li class="acc-item">
-                <div style="flex:1;cursor:pointer" onclick="ed(${t.id})">
-                    <div class="acc-text">${t.text}</div>
-                    <div style="color:#98A2B3;font-size:10px">${t.date.slice(8,10)} - ${t.category}</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span style="font-weight:700; color:${t.executed?(t.amount>0? 'var(--success)':'var(--text-1)'):'#D0D5DD'}">$${Math.abs(t.amount).toLocaleString()}</span>
-                    <button class="btn-del-mini" onclick="del(${t.id})"><i class="fas fa-times"></i></button>
-                </div>
-            </li>`;
+            const html = `<li class="acc-item"><div style="flex:1;cursor:pointer" onclick="ed(${t.id})"><div class="acc-text">${t.text}</div><div style="color:#98A2B3;font-size:10px">${t.date.slice(8,10)} - ${t.category}</div></div><div style="display:flex;align-items:center;gap:6px"><span style="font-weight:700; color:${t.executed?(t.amount>0? 'var(--success)':'var(--text-1)'):'#D0D5DD'}">$${Math.abs(t.amount).toLocaleString()}</span><button class="btn-del-mini" onclick="del(${t.id})"><i class="fas fa-times"></i></button></div></li>`;
             if(t.amount>0) li.innerHTML+=html; else le.innerHTML+=html;
         });
         document.getElementById('tot-inc').innerText=`$${f.reduce((s,t)=>t.amount>0?s+t.amount:s,0).toLocaleString()}`;
@@ -333,12 +328,9 @@
 
     function renderList(f) {
         const b = document.getElementById('list-table'); b.innerHTML='';
-        f.forEach(t => {
-            b.innerHTML += `<tr><td>${t.date.slice(8,10)}</td><td>${t.text}<br><small>${t.category}</small></td><td style="text-align:right;font-weight:700">$${Math.abs(t.amount).toLocaleString()}</td></tr>`;
-        });
+        f.forEach(t => { b.innerHTML += `<tr><td>${t.date.slice(8,10)}</td><td>${t.text}<br><small>${t.category}</small></td><td style="text-align:right;font-weight:700">$${Math.abs(t.amount).toLocaleString()}</td></tr>`; });
     }
 
-    // --- GRÁFICO ---
     let myChart = null;
     function drawChart(f, inc, exp) {
         const ctx = document.getElementById('chart').getContext('2d');
@@ -347,45 +339,41 @@
         let lbl = Object.keys(grp), val = Object.values(grp);
         const bal = inc - exp; if(bal > 0) { lbl.push("Saldo"); val.push(bal); }
         const colors = ['#2563EB','#F04438','#12B76A','#F79009','#7C3AED','#000000'];
-
         if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: lbl, datasets: [{ data: val, backgroundColor: lbl.map((x,i)=>x==='Saldo'?'#E4E7EC':colors[i%colors.length]), borderWidth:0 }] },
-            options: { maintainAspectRatio: false, plugins: { legend: { position:'right', labels:{boxWidth:10, font:{size:10}}} } }
-        });
+        myChart = new Chart(ctx, { type: 'doughnut', data: { labels: lbl, datasets: [{ data: val, backgroundColor: lbl.map((x,i)=>x==='Saldo'?'#E4E7EC':colors[i%colors.length]), borderWidth:0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position:'right', labels:{boxWidth:10, font:{size:10}}} } } });
     }
 
-    // --- UTILS ---
     function toggleStatus() { const c=document.getElementById('executed'); c.checked=!c.checked; const b=document.getElementById('btn-status'); if(c.checked){b.classList.add('active');b.innerText='Pagado'}else{b.classList.remove('active');b.innerText='Pendiente'} }
     function showToast(m) { const x=document.getElementById("toast"); x.innerText=m; x.className="show"; setTimeout(()=>{x.className=""},3000); }
     function saveApp(){ localStorage.setItem('appData_v8',JSON.stringify(appData)); }
     function saveTrans(){ localStorage.setItem('transactions_v4',JSON.stringify(transactions)); }
     function chMonth(s) { const i=document.getElementById('currentMonth'), [y,m]=i.value.split('-').map(Number); const d=new Date(y,m-1+s,1); i.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; load(); }
-    
     function del(id) { if(confirm('¿Borrar movimiento?')){ transactions=transactions.filter(x=>x.id!==id); saveTrans(); load(); showToast("Borrado"); } }
-    
     function ed(id) { 
         const t=transactions.find(x=>x.id===id); editingId=id;
-        document.getElementById('date').value=t.date; 
-        document.getElementById('amount').value=Math.abs(t.amount);
+        document.getElementById('date').value=t.date; document.getElementById('amount').value=Math.abs(t.amount);
         document.getElementById('type').value=t.amount>0?'income':'expense'; upCat();
         document.getElementById('category').value=t.category; upCon();
         document.getElementById('conceptSelect').value=t.text;
-        
         const chk = document.getElementById('executed'); chk.checked=t.executed;
-        const btn = document.getElementById('btn-status');
-        if(chk.checked){btn.classList.add('active');btn.innerText='Pagado'}else{btn.classList.remove('active');btn.innerText='Pendiente'}
-
-        document.getElementById('btn-submit').innerText='Actualizar'; 
-        document.getElementById('btn-cancel').style.display='block';
+        const btn = document.getElementById('btn-status'); if(chk.checked){btn.classList.add('active');btn.innerText='Pagado'}else{btn.classList.remove('active');btn.innerText='Pendiente'}
+        document.getElementById('btn-submit').innerText='Actualizar'; document.getElementById('btn-cancel').style.display='block';
         document.getElementById('form').scrollIntoView({behavior:'smooth'});
     }
-    
     function cancelEdit(){ editingId=null; document.getElementById('form').reset(); document.getElementById('btn-submit').innerText='Guardar'; document.getElementById('btn-cancel').style.display='none'; toggleStatus(); document.getElementById('executed').checked=true; document.getElementById('btn-status').classList.add('active'); document.getElementById('btn-status').innerText='Pagado'; }
     function toggleView(){ isAccView=!isAccView; document.getElementById('view-acc').style.display=isAccView?'flex':'none'; document.getElementById('view-list').style.display=isAccView?'none':'block'; }
     function dl(){ const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({transactions,appData})); a.download="backup.json"; a.click(); }
-    function ul(e){ const r=new FileReader(); r.onload=ev=>{ const d=JSON.parse(ev.target.result); transactions=d.transactions; appData=d.appData; saveTrans(); saveApp(); load(); showToast("Datos Cargados"); }; r.readAsText(e.files[0]); }
+    function ul(e){ const r=new FileReader(); r.onload=ev=>{ const d=JSON.parse(ev.target.result); transactions=d.transactions; appData=d.appData; saveTrans(); saveApp(); load(); showToast("Datos Cargados"); upCat(); }; r.readAsText(e.files[0]); }
+    
+    // --- FUNCIÓN DE EMERGENCIA ---
+    function resetConfig() {
+        if(confirm("¿RESET CONFIG?\nEsto borrará tus categorías personalizadas y pondrá las predeterminadas.\nTus movimientos NO se borrarán.")) {
+            appData = def;
+            saveApp();
+            upCat();
+            showToast("Configuración reiniciada");
+        }
+    }
 </script>
 </body>
 </html>
