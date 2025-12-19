@@ -8,7 +8,6 @@
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/180/wallet.png">
     <meta name="apple-mobile-web-app-title" content="Finanzas">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,95 +16,68 @@
     <style>
         :root {
             --bg: #F2F4F7; --card: #FFFFFF; --border: #E4E7EC;
-            --text-1: #101828; --text-2: #475467; --text-3: #98A2B3;
-            --primary: #2563EB; --success: #16A34A; --danger: #D92D20; --warn: #F79009;
-            --r-card: 16px; --r-in: 10px;
+            --text-1: #101828; --text-2: #344054; --primary: #2563EB; 
+            --success: #12B76A; --danger: #F04438; --r: 12px;
         }
-
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-1); margin: 0; padding: 12px; font-size: 13px; padding-bottom: 40px; }
-
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-1); margin: 0; padding: 12px; padding-bottom: 50px; }
         .layout { display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
         
-        /* TARJETAS */
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-card); padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-
-        /* HEADER */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; background: var(--card); padding: 10px 16px; border-radius: var(--r-card); border: 1px solid var(--border); }
-        .app-title { display: flex; align-items: center; gap: 8px; color: var(--text-1); font-weight: 700; font-size: 1.2em; }
-        .month-nav { display: flex; align-items: center; gap: 4px; background: #F9FAFB; padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
-        .month-nav button { border: none; background: transparent; padding: 4px 10px; color: var(--text-2); font-size: 14px; }
-        .month-display { position: relative; width: 85px; text-align: center; font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--text-2); }
+        /* CARD & HEADER */
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; box-shadow: 0 1px 2px rgba(16,24,40,0.05); }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: var(--card); padding: 8px 12px; border-radius: var(--r); border: 1px solid var(--border); }
+        .month-nav { display: flex; align-items: center; background: #F9FAFB; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+        .month-nav button { border: none; background: transparent; padding: 4px 12px; color: var(--text-2); }
+        .month-display { position: relative; width: 90px; text-align: center; font-weight: 700; font-size: 12px; }
         #currentMonth { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
 
         /* KPIs */
-        .kpi-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .kpi-card { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .kpi-label { font-size: 9px; color: var(--text-3); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        .kpi-value { font-size: 15px; font-weight: 700; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .kpi-input { border: 1px solid var(--border); width: 100%; text-align: center; font-weight: 600; font-size: 13px; border-radius: 6px; padding: 4px; color: var(--text-1); background: #F9FAFB; }
+        .kpi-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .kpi-card { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 10px; text-align: center; }
+        .kpi-label { font-size: 10px; color: #667085; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+        .kpi-val { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+        .kpi-in { border: 1px solid var(--border); width: 100%; text-align: center; font-weight: 600; font-size: 13px; border-radius: 6px; padding: 4px; background: #F9FAFB; }
 
-        /* CUENTA T (MEJORADA) */
-        .acc-view { display: flex; gap: 10px; height: 320px; margin-top: 10px; }
-        .acc-col { flex: 1; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; background: #FFF; }
-        .acc-head { padding: 8px; text-align: center; color: white; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .acc-head.inc { background: var(--success); }
-        .acc-head.exp { background: var(--danger); }
-        .acc-list { flex: 1; list-style: none; padding: 0; margin: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        
-        .acc-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #F2F4F7; font-size: 12px; transition: background 0.2s; }
-        .acc-item:active { background: #F9FAFB; }
-        .acc-item-left { display: flex; flex-direction: column; gap: 2px; overflow: hidden; max-width: 65%; }
-        .acc-text { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .acc-cat { font-size: 10px; color: var(--text-3); }
-        .acc-item-right { display: flex; align-items: center; gap: 8px; }
-        .acc-amount { font-weight: 700; }
-        .btn-del-mini { color: var(--text-3); background: none; border: none; font-size: 14px; padding: 4px; cursor: pointer; }
-        .btn-del-mini:hover { color: var(--danger); }
-        
-        .alert-text { color: var(--danger); font-weight: 600; }
-        .alert-icon { color: var(--warn); font-size: 10px; margin-left: 4px; }
+        /* CUENTA T */
+        .acc-view { display: flex; gap: 8px; height: 300px; margin-top: 10px; }
+        .acc-col { flex: 1; border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; background: #FFF; }
+        .acc-head { padding: 8px; text-align: center; color: white; font-weight: 700; font-size: 10px; text-transform: uppercase; }
+        .acc-head.inc { background: var(--success); } .acc-head.exp { background: var(--danger); }
+        .acc-list { flex: 1; list-style: none; padding: 0; margin: 0; overflow-y: auto; }
+        .acc-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #F2F4F7; font-size: 12px; }
+        .acc-text { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%; }
+        .btn-del-mini { border:none; background:none; color:#98A2B3; padding: 4px; font-size:14px; }
+        .acc-tot { padding: 8px; text-align: right; font-weight: 700; font-size: 12px; background: #F9FAFB; border-top: 1px solid var(--border); }
 
-        .acc-total { padding: 10px; text-align: right; font-weight: 700; font-size: 13px; background: #F9FAFB; border-top: 1px solid var(--border); }
-
-        /* FORMULARIO MODERNO */
+        /* FORMULARIO GESTIÓN */
         .form-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
         .form-col { flex: 1; min-width: 0; }
-        .form-col.fixed { flex: 0 0 100px; } /* Ancho fijo para botón Pagado */
+        .form-fixed { width: 100px; flex-shrink: 0; }
         
         label { display: block; font-size: 10px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
-        input, select { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--r-in); font-size: 14px; background: #FFF; -webkit-appearance: none; }
+        input, select { width: 100%; height: 40px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: #FFF; }
         
-        /* Toggle Switch para "Pagado" */
-        .toggle-btn {
-            display: flex; align-items: center; justify-content: center; width: 100%; height: 40px;
-            border: 1px solid var(--border); border-radius: var(--r-in); background: #FFF;
-            cursor: pointer; transition: all 0.2s; gap: 6px; font-weight: 600; font-size: 12px; color: var(--text-2);
-        }
-        .toggle-btn.active { background: var(--success); color: white; border-color: var(--success); }
+        .toggle-btn { display: flex; align-items: center; justify-content: center; width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 8px; background: #FFF; gap: 6px; font-weight: 600; font-size: 12px; color: var(--text-2); cursor: pointer; }
+        .toggle-btn.active { background: #ECFDF3; color: var(--success); border-color: var(--success); }
         
-        .btn-main { background: var(--text-1); color: white; border: none; width: 100%; border-radius: var(--r-in); font-weight: 600; height: 44px; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-main:active { transform: scale(0.98); }
-        .btn-cancel { background: white; color: var(--text-1); border: 1px solid var(--border); margin-top: 8px; }
-
-        /* TOAST NOTIFICATION */
-        #toast {
-            visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center;
-            border-radius: 50px; padding: 12px; position: fixed; z-index: 99; left: 50%; bottom: 30px;
-            transform: translateX(-50%); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+        .btn-main { background: var(--text-1); color: white; border: none; width: 100%; border-radius: 8px; font-weight: 600; height: 44px; margin-top: 6px; font-size: 14px; }
+        .btn-cancel { background: #FFF; color: var(--text-1); border: 1px solid var(--border); margin-top: 8px; }
+        
+        /* BOTONES DE GESTIÓN DE LISTA (BASURA) */
+        .manage-group { display: flex; gap: 6px; }
+        .btn-trash-list { width: 40px; height: 40px; border: 1px solid #FECDCA; background: #FEF3F2; color: var(--danger); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        
+        /* TOAST */
+        #toast { visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; z-index: 99; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 13px; }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* VISTA LISTA SECUNDARIA */
-        .btn-switch { background: transparent; border: none; color: var(--primary); font-size: 12px; font-weight: 600; width: 100%; padding: 8px; margin-bottom: 5px; cursor: pointer; }
-        .list-view { display: none; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: var(--text-3); font-size: 10px; padding: 8px; border-bottom: 1px solid var(--border); }
+        /* EXTRAS */
+        .tools { display: flex; gap: 8px; margin-top: 15px; }
+        .btn-tool { flex: 1; height: 36px; background: white; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .list-view { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; font-size: 10px; color: #667085; padding: 8px; border-bottom: 1px solid var(--border); }
         td { padding: 10px 8px; border-bottom: 1px solid var(--border); font-size: 12px; }
-
-        .tools { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-tool { flex: 1; height: 36px; background: white; border: 1px solid var(--border); border-radius: 8px; color: var(--text-2); font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -113,120 +85,114 @@
 <div class="layout">
     
     <div class="top-bar">
-        <div class="app-title"><i class="fas fa-wallet" style="color:var(--primary)"></i> <span>Javier & Mary</span></div>
+        <div style="font-weight:700; font-size:1.1em; color:var(--primary)"><i class="fas fa-wallet"></i> Javier & Mary</div>
         <div class="month-nav">
             <button onclick="chMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="month-display">
-                <span id="monthLabel">DIC 2025</span>
-                <input type="month" id="currentMonth" onchange="load()">
-            </div>
+            <div class="month-display"><span id="monthLabel"></span><input type="month" id="currentMonth" onchange="load()"></div>
             <button onclick="chMonth(1)"><i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
     <div class="kpi-row">
         <div class="kpi-card">
-            <span class="kpi-label">Dólar Ref.</span>
-            <input type="number" id="manualDolar" class="kpi-input" value="1200" onchange="saveDolar()">
+            <span class="kpi-label">Dólar</span>
+            <input type="number" id="manualDolar" class="kpi-in" value="1200" onchange="load()">
         </div>
         <div class="kpi-card">
             <span class="kpi-label">Balance</span>
-            <div class="kpi-value" id="val-bal">$0</div>
+            <div class="kpi-val" id="val-bal">$0</div>
         </div>
         <div class="kpi-card">
             <span class="kpi-label">Ahorro USD</span>
-            <div class="kpi-value" id="val-usd" style="color:var(--warn)">$0</div>
+            <div class="kpi-val" id="val-usd" style="color:#F79009">$0</div>
         </div>
     </div>
 
     <div class="card">
-        <button class="btn-switch" onclick="toggleView()" id="btnSwitch">Ver Historial Completo</button>
+        <button onclick="toggleView()" id="btnSwitch" style="width:100%; border:none; background:transparent; color:var(--primary); font-weight:600; font-size:12px; cursor:pointer;">Cambiar Vista</button>
         
         <div id="view-acc" class="acc-view">
             <div class="acc-col">
                 <div class="acc-head inc">INGRESOS</div>
                 <ul class="acc-list" id="list-inc"></ul>
-                <div class="acc-total" id="tot-inc" style="color:var(--success)">$0</div>
+                <div class="acc-tot" id="tot-inc" style="color:var(--success)">$0</div>
             </div>
             <div class="acc-col">
                 <div class="acc-head exp">EGRESOS</div>
                 <ul class="acc-list" id="list-exp"></ul>
-                <div class="acc-total" id="tot-exp" style="color:var(--danger)">$0</div>
+                <div class="acc-tot" id="tot-exp" style="color:var(--danger)">$0</div>
             </div>
         </div>
 
         <div id="view-list" class="list-view">
-            <table><thead><tr><th>Fecha</th><th>Detalle</th><th style="text-align:right">Monto</th></tr></thead><tbody id="list-table"></tbody></table>
+            <table><thead><tr><th>Fecha</th><th>Concepto</th><th style="text-align:right">Monto</th></tr></thead><tbody id="list-table"></tbody></table>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="margin:0 0 12px 0; font-size:12px; color:var(--text-3); text-transform:uppercase; letter-spacing:1px;">Nuevo Movimiento</h3>
+        <h3 style="margin:0 0 12px 0; font-size:12px; color:#667085; text-transform:uppercase;">Nuevo Registro</h3>
         <form id="form">
             <div class="form-row">
-                <div class="form-col">
-                    <input type="date" id="date" required>
-                </div>
-                <div class="form-col fixed">
-                    <div class="toggle-btn active" id="btn-status" onclick="toggleStatus()">
-                        <i class="fas fa-check"></i> Pagado
-                    </div>
+                <div class="form-col"><input type="date" id="date" required></div>
+                <div class="form-col form-fixed">
+                    <div class="toggle-btn active" id="btn-status" onclick="toggleStatus()">Pagado</div>
                     <input type="checkbox" id="executed" checked style="display:none">
                 </div>
             </div>
-
             <div class="form-row">
-                <div class="form-col fixed" style="flex: 0 0 110px;">
+                <div class="form-col form-fixed">
                     <select id="type" onchange="upCat()" style="font-weight:600">
                         <option value="expense">🔴 Gasto</option>
                         <option value="income">🟢 Ingreso</option>
                     </select>
                 </div>
-                <div class="form-col">
-                    <input type="number" id="amount" placeholder="$0.00" required step="0.01" style="font-weight:700">
-                </div>
+                <div class="form-col"><input type="number" id="amount" placeholder="$0.00" required step="0.01" style="font-weight:700"></div>
             </div>
-
+            <label>Categoría:</label>
             <div class="form-row">
-                <div class="form-col">
+                <div class="form-col manage-group">
                     <select id="category" onchange="upCon()"></select>
-                    <input id="customCat" placeholder="Nueva Cat..." style="display:none; margin-top:5px">
-                </div>
-                <div class="form-col">
-                    <select id="conceptSelect" onchange="hCon()"></select>
-                    <input id="customCon" placeholder="Nuevo Con..." style="display:none; margin-top:5px">
+                    <button type="button" class="btn-trash-list" onclick="delItem('cat')"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
+            <input id="customCat" placeholder="Escribe nueva categoría..." style="display:none; margin-bottom:10px;">
+            
+            <label>Concepto:</label>
+            <div class="form-row">
+                <div class="form-col manage-group">
+                    <select id="conceptSelect" onchange="hCon()"></select>
+                    <button type="button" class="btn-trash-list" onclick="delItem('con')"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+            <input id="customCon" placeholder="Escribe nuevo concepto..." style="display:none; margin-bottom:10px;">
 
-            <button type="submit" id="btn-submit" class="btn-main">Guardar Movimiento</button>
+            <button type="submit" id="btn-submit" class="btn-main">Guardar</button>
             <button type="button" id="btn-cancel" onclick="cancelEdit()" class="btn-main btn-cancel" style="display:none">Cancelar</button>
         </form>
     </div>
 
     <div class="card">
-        <h3 style="margin:0 0 10px 0; font-size:12px; color:var(--text-3); text-transform:uppercase;">Análisis</h3>
-        <div style="height:200px"><canvas id="chart"></canvas></div>
-        
+        <h3 style="margin:0 0 10px 0; font-size:12px; color:#667085;">ANÁLISIS</h3>
+        <div style="height:180px"><canvas id="chart"></canvas></div>
         <div class="tools">
-            <button class="btn-tool" onclick="dl()"><i class="fas fa-download"></i> Backup</button>
+            <button class="btn-tool" onclick="dl()">Descargar Datos</button>
             <input type="file" id="ul" style="display:none" onchange="ul(this)">
-            <button class="btn-tool" onclick="document.getElementById('ul').click()"><i class="fas fa-upload"></i> Restaurar</button>
+            <button class="btn-tool" onclick="document.getElementById('ul').click()">Cargar Datos</button>
         </div>
     </div>
 </div>
 
-<div id="toast">Acción realizada</div>
+<div id="toast">Notificación</div>
 
 <script>
-    // DATA & STATE
-    const def = { cats: { income: ["Ingresos"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] }, cons: { "Ingresos":["Sueldo","Ventas"], "Esenciales":["Alquiler","Supermercado","Luz","Internet"], "Deudas":["Tarjeta Visa","Préstamo"], "Varios":["Cenas","Regalos"], "Ahorro":["Compra USD"] } };
+    // --- DATOS INICIALES ---
+    const def = { cats: { income: ["Ingresos"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] }, cons: { "Ingresos":["Sueldo"], "Esenciales":["Alquiler","Super"], "Deudas":["Tarjeta"], "Varios":["Salidas"], "Ahorro":["USD"] } };
     let appData = JSON.parse(localStorage.getItem('appData_v8')) || def;
     let transactions = JSON.parse(localStorage.getItem('transactions_v4')) || [];
     let editingId = null;
     let isAccView = true;
-    const palette = ['#2563EB', '#D92D20', '#16A34A', '#F79009', '#7C3AED', '#DB2777', '#0891B2'];
 
-    // INIT
+    // --- INICIO ---
     window.onload = () => {
         const t = new Date();
         document.getElementById('date').value = t.toISOString().split('T')[0];
@@ -234,51 +200,99 @@
         upCat(); load();
     };
 
-    // FORM LOGIC
-    function toggleStatus() {
-        const chk = document.getElementById('executed');
-        const btn = document.getElementById('btn-status');
-        chk.checked = !chk.checked;
-        if(chk.checked) { btn.classList.add('active'); btn.innerHTML = '<i class="fas fa-check"></i> Pagado'; }
-        else { btn.classList.remove('active'); btn.innerHTML = '<i class="fas fa-clock"></i> Pendiente'; }
-    }
-
+    // --- LÓGICA DE LISTAS (CASCADA) ---
     function upCat() {
         const t = document.getElementById('type').value, s = document.getElementById('category'); s.innerHTML='';
         let c = t==='income'?appData.cats.income:appData.cats.expense;
-        [...c].sort().forEach(x=>s.add(new Option(x,x))); s.add(new Option('Otro...','Otro')); upCon();
+        // Ordenar y llenar
+        [...c].sort().forEach(x=>s.add(new Option(x,x))); 
+        s.add(new Option('➕ Otro...','Otro')); 
+        upCon();
     }
+
     function upCon() {
-        const c=document.getElementById('category').value, s=document.getElementById('conceptSelect'); s.innerHTML='';
-        if(c==='Otro') document.getElementById('customCat').style.display='block';
-        else {
+        const c = document.getElementById('category').value;
+        const s = document.getElementById('conceptSelect'); 
+        s.innerHTML='';
+        
+        // Manejo de "Otro" en Categoría
+        if(c==='Otro') {
+            document.getElementById('customCat').style.display='block';
+            s.add(new Option('➕ Otro...','Otro')); // Si es cat nueva, obligamos a concepto nuevo
+            hCon();
+            return;
+        } else {
             document.getElementById('customCat').style.display='none';
-            (appData.cons[c]||[]).sort().forEach(x=>s.add(new Option(x,x))); s.add(new Option('Otro...','Otro'));
         }
+
+        // Si la categoría existe, buscamos sus conceptos
+        let list = appData.cons[c];
+        if(!list) { list = []; appData.cons[c] = []; } // Protección contra nulos
+
+        [...list].sort().forEach(x=>s.add(new Option(x,x))); 
+        s.add(new Option('➕ Otro...','Otro'));
         hCon();
     }
-    function hCon() { document.getElementById('customCon').style.display = document.getElementById('conceptSelect').value==='Otro'?'block':'none'; }
 
-    // SAVE
+    function hCon() { 
+        document.getElementById('customCon').style.display = document.getElementById('conceptSelect').value==='Otro'?'block':'none'; 
+    }
+
+    // --- LÓGICA DE GESTIÓN (BORRAR ITEMS DE LA LISTA) ---
+    function delItem(level) {
+        if(level === 'cat') {
+            const val = document.getElementById('category').value;
+            if(val === 'Otro') return showToast("No puedes borrar 'Otro'");
+            if(confirm(`¿Eliminar la categoría "${val}" y sus conceptos para siempre?`)) {
+                const t = document.getElementById('type').value;
+                if(t === 'income') appData.cats.income = appData.cats.income.filter(x => x !== val);
+                else appData.cats.expense = appData.cats.expense.filter(x => x !== val);
+                delete appData.cons[val];
+                saveApp(); upCat(); showToast("Categoría eliminada");
+            }
+        } else {
+            const val = document.getElementById('conceptSelect').value;
+            const cat = document.getElementById('category').value;
+            if(val === 'Otro') return showToast("No puedes borrar 'Otro'");
+            if(confirm(`¿Eliminar el concepto "${val}" de la lista?`)) {
+                appData.cons[cat] = appData.cons[cat].filter(x => x !== val);
+                saveApp(); upCon(); showToast("Concepto eliminado");
+            }
+        }
+    }
+
+    // --- GUARDAR MOVIMIENTO ---
     document.getElementById('form').onsubmit = (e) => {
         e.preventDefault();
         const type=document.getElementById('type').value, amt=document.getElementById('amount').value, date=document.getElementById('date').value;
         let cat=document.getElementById('category').value, con=document.getElementById('conceptSelect').value;
         
-        if(cat==='Otro'){ cat=document.getElementById('customCat').value; if(type==='income'){if(!appData.cats.income.includes(cat))appData.cats.income.push(cat)}else{if(!appData.cats.expense.includes(cat))appData.cats.expense.push(cat)} appData.cons[cat]=[]; }
-        if(con==='Otro'){ con=document.getElementById('customCon').value; if(!appData.cons[cat].includes(con))appData.cons[cat].push(con); }
-        localStorage.setItem('appData_v8',JSON.stringify(appData));
+        // LOGICA DE "OTRO" (AGREGAR NUEVOS)
+        if(cat==='Otro'){ 
+            cat=document.getElementById('customCat').value.trim(); 
+            if(!cat) return showToast("Escribe una categoría");
+            if(type==='income'){ if(!appData.cats.income.includes(cat)) appData.cats.income.push(cat); }
+            else { if(!appData.cats.expense.includes(cat)) appData.cats.expense.push(cat); }
+            if(!appData.cons[cat]) appData.cons[cat]=[]; 
+        }
         
+        if(con==='Otro'){ 
+            con=document.getElementById('customCon').value.trim();
+            if(!con) return showToast("Escribe un concepto");
+            if(!appData.cons[cat].includes(con)) appData.cons[cat].push(con);
+        }
+        
+        saveApp(); // Guardar cambios en listas
+
         const tr = { id: editingId||Date.now(), date: date, monthKey: date.slice(0,7), text: con, category: cat, amount: type==='expense'?-Math.abs(amt):Math.abs(amt), executed: document.getElementById('executed').checked };
         
-        if(editingId){ transactions[transactions.findIndex(x=>x.id===editingId)]=tr; showToast("Movimiento actualizado"); cancelEdit(); } 
-        else { transactions.push(tr); showToast("Movimiento guardado"); }
+        if(editingId){ transactions[transactions.findIndex(x=>x.id===editingId)]=tr; showToast("Actualizado"); cancelEdit(); } 
+        else { transactions.push(tr); showToast("Guardado"); }
         
-        localStorage.setItem('transactions_v4',JSON.stringify(transactions));
-        load();
+        saveTrans(); load();
     };
 
-    // RENDER
+    // --- RENDERIZADO ---
     function load() {
         const mk = document.getElementById('currentMonth').value;
         const d = new Date(mk+'-02');
@@ -289,7 +303,7 @@
         const inc = f.reduce((s,t)=>t.amount>0?s+t.amount:s,0);
         const exp = f.reduce((s,t)=>t.amount<0?s+Math.abs(t.amount):s,0);
         document.getElementById('val-bal').innerText = `$${(inc-exp).toLocaleString()}`;
-        const dol = parseFloat(document.getElementById('manualDolar').value)||1200;
+        const dol = parseFloat(document.getElementById('manualDolar').value)||1;
         document.getElementById('val-usd').innerText = `US$ ${((inc-exp)/dol).toFixed(2)}`;
 
         if(isAccView) renderAcc(f); else renderList(f);
@@ -299,22 +313,15 @@
     function renderAcc(f) {
         const li = document.getElementById('list-inc'), le = document.getElementById('list-exp');
         li.innerHTML=''; le.innerHTML='';
-        const today = new Date(); today.setHours(0,0,0,0);
         
         f.forEach(t => {
-            // Logic Alert
-            const tDate = new Date(t.date+'T00:00:00');
-            const diff = Math.ceil((tDate - today)/(1000*60*60*24));
-            const isAlert = !t.executed && diff >= 0 && diff <= 5;
-            
-            const html = `
-            <li class="acc-item">
-                <div class="acc-item-left" onclick="ed(${t.id})" style="cursor:pointer">
-                    <span class="acc-text ${isAlert?'alert-text':''}">${t.text}${isAlert?' <i class="fas fa-exclamation-circle alert-icon"></i>':''}</span>
-                    <span class="acc-cat">${t.date.slice(8,10)} - ${t.category}</span>
+            const html = `<li class="acc-item">
+                <div style="flex:1;cursor:pointer" onclick="ed(${t.id})">
+                    <div class="acc-text">${t.text}</div>
+                    <div style="color:#98A2B3;font-size:10px">${t.date.slice(8,10)} - ${t.category}</div>
                 </div>
-                <div class="acc-item-right">
-                    <span class="acc-amount" style="color:${t.executed? (t.amount>0?'var(--success)':'var(--text-1)'):'#9CA3AF'}">$${Math.abs(t.amount).toLocaleString()}</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <span style="font-weight:700; color:${t.executed?(t.amount>0? 'var(--success)':'var(--text-1)'):'#D0D5DD'}">$${Math.abs(t.amount).toLocaleString()}</span>
                     <button class="btn-del-mini" onclick="del(${t.id})"><i class="fas fa-times"></i></button>
                 </div>
             </li>`;
@@ -327,78 +334,58 @@
     function renderList(f) {
         const b = document.getElementById('list-table'); b.innerHTML='';
         f.forEach(t => {
-            b.innerHTML += `<tr><td>${t.date.slice(8,10)}</td><td>${t.text}<br><small style="color:#666">${t.category}</small></td><td style="text-align:right;font-weight:700">$${Math.abs(t.amount).toLocaleString()}</td></tr>`;
+            b.innerHTML += `<tr><td>${t.date.slice(8,10)}</td><td>${t.text}<br><small>${t.category}</small></td><td style="text-align:right;font-weight:700">$${Math.abs(t.amount).toLocaleString()}</td></tr>`;
         });
     }
 
-    // CHART
+    // --- GRÁFICO ---
     let myChart = null;
     function drawChart(f, inc, exp) {
         const ctx = document.getElementById('chart').getContext('2d');
         const exps = f.filter(t=>t.amount<0);
         const grp = {}; exps.forEach(t=>{ grp[t.category] = (grp[t.category]||0)+Math.abs(t.amount) });
         let lbl = Object.keys(grp), val = Object.values(grp);
-        const bal = inc - exp;
-        if(bal > 0) { lbl.push("Saldo"); val.push(bal); }
-        const bg = lbl.map((l,i) => l==='Saldo' ? '#E5E7EB' : palette[i % palette.length]);
+        const bal = inc - exp; if(bal > 0) { lbl.push("Saldo"); val.push(bal); }
+        const colors = ['#2563EB','#F04438','#12B76A','#F79009','#7C3AED','#000000'];
 
         if(myChart) myChart.destroy();
         myChart = new Chart(ctx, {
             type: 'doughnut',
-            data: { labels: lbl, datasets: [{ data: val, backgroundColor: bg, borderWidth: 0, hoverOffset: 4 }] },
-            options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { family:'Inter', size: 11 } } } } }
+            data: { labels: lbl, datasets: [{ data: val, backgroundColor: lbl.map((x,i)=>x==='Saldo'?'#E4E7EC':colors[i%colors.length]), borderWidth:0 }] },
+            options: { maintainAspectRatio: false, plugins: { legend: { position:'right', labels:{boxWidth:10, font:{size:10}}} } }
         });
     }
 
-    // ACTIONS
-    function showToast(msg) {
-        const x = document.getElementById("toast");
-        x.innerText = msg; x.className = "show";
-        setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
-    }
+    // --- UTILS ---
+    function toggleStatus() { const c=document.getElementById('executed'); c.checked=!c.checked; const b=document.getElementById('btn-status'); if(c.checked){b.classList.add('active');b.innerText='Pagado'}else{b.classList.remove('active');b.innerText='Pendiente'} }
+    function showToast(m) { const x=document.getElementById("toast"); x.innerText=m; x.className="show"; setTimeout(()=>{x.className=""},3000); }
+    function saveApp(){ localStorage.setItem('appData_v8',JSON.stringify(appData)); }
+    function saveTrans(){ localStorage.setItem('transactions_v4',JSON.stringify(transactions)); }
     function chMonth(s) { const i=document.getElementById('currentMonth'), [y,m]=i.value.split('-').map(Number); const d=new Date(y,m-1+s,1); i.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; load(); }
-    function saveDolar(){ load(); }
-    function dl(){ const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({transactions,appData})); a.download="backup.json"; a.click(); }
-    function ul(e){ const r=new FileReader(); r.onload=ev=>{ const d=JSON.parse(ev.target.result); transactions=d.transactions; appData=d.appData; localStorage.setItem('transactions_v4',JSON.stringify(transactions)); localStorage.setItem('appData_v8',JSON.stringify(appData)); load(); showToast("Datos restaurados"); }; r.readAsText(e.files[0]); }
     
-    function del(id) { 
-        if(confirm('¿Eliminar movimiento?')){ transactions=transactions.filter(x=>x.id!==id); localStorage.setItem('transactions_v4',JSON.stringify(transactions)); load(); showToast("Eliminado"); } 
-    }
+    function del(id) { if(confirm('¿Borrar movimiento?')){ transactions=transactions.filter(x=>x.id!==id); saveTrans(); load(); showToast("Borrado"); } }
     
     function ed(id) { 
         const t=transactions.find(x=>x.id===id); editingId=id;
-        document.getElementById('date').value=t.date; document.getElementById('amount').value=Math.abs(t.amount);
+        document.getElementById('date').value=t.date; 
+        document.getElementById('amount').value=Math.abs(t.amount);
         document.getElementById('type').value=t.amount>0?'income':'expense'; upCat();
         document.getElementById('category').value=t.category; upCon();
         document.getElementById('conceptSelect').value=t.text;
         
-        // Update Status Button
-        const chk = document.getElementById('executed');
-        chk.checked = t.executed;
+        const chk = document.getElementById('executed'); chk.checked=t.executed;
         const btn = document.getElementById('btn-status');
-        if(chk.checked) { btn.classList.add('active'); btn.innerHTML = '<i class="fas fa-check"></i> Pagado'; }
-        else { btn.classList.remove('active'); btn.innerHTML = '<i class="fas fa-clock"></i> Pendiente'; }
+        if(chk.checked){btn.classList.add('active');btn.innerText='Pagado'}else{btn.classList.remove('active');btn.innerText='Pendiente'}
 
-        document.getElementById('btn-submit').innerText='Guardar Cambios'; 
+        document.getElementById('btn-submit').innerText='Actualizar'; 
         document.getElementById('btn-cancel').style.display='block';
-        document.getElementById('form').scrollIntoView({behavior: 'smooth'});
+        document.getElementById('form').scrollIntoView({behavior:'smooth'});
     }
     
-    function cancelEdit(){ 
-        editingId=null; document.getElementById('form').reset(); 
-        document.getElementById('btn-submit').innerText='Guardar Movimiento'; 
-        document.getElementById('btn-cancel').style.display='none';
-        // Reset status btn default
-        const btn = document.getElementById('btn-status');
-        btn.classList.add('active'); btn.innerHTML = '<i class="fas fa-check"></i> Pagado';
-    }
-    
-    function toggleView() {
-        isAccView = !isAccView;
-        document.getElementById('view-acc').style.display = isAccView ? 'flex' : 'none';
-        document.getElementById('view-list').style.display = isAccView ? 'none' : 'block';
-        document.getElementById('btnSwitch').innerText = isAccView ? 'Ver Historial Completo' : 'Ver Cuenta T';
-    }
+    function cancelEdit(){ editingId=null; document.getElementById('form').reset(); document.getElementById('btn-submit').innerText='Guardar'; document.getElementById('btn-cancel').style.display='none'; toggleStatus(); document.getElementById('executed').checked=true; document.getElementById('btn-status').classList.add('active'); document.getElementById('btn-status').innerText='Pagado'; }
+    function toggleView(){ isAccView=!isAccView; document.getElementById('view-acc').style.display=isAccView?'flex':'none'; document.getElementById('view-list').style.display=isAccView?'none':'block'; }
+    function dl(){ const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({transactions,appData})); a.download="backup.json"; a.click(); }
+    function ul(e){ const r=new FileReader(); r.onload=ev=>{ const d=JSON.parse(ev.target.result); transactions=d.transactions; appData=d.appData; saveTrans(); saveApp(); load(); showToast("Datos Cargados"); }; r.readAsText(e.files[0]); }
 </script>
 </body>
 </html>
