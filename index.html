@@ -2,20 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuentas Javier y Mary</title>
     
     <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/180/wallet.png">
     <meta name="apple-mobile-web-app-title" content="Finanzas">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* --- DISEÑO COMPACTO V10.3 --- */
+        /* --- DISEÑO ORIGINAL COMPACTO RECUPERADO --- */
         :root {
             --bg-app: #F7F9FC; --surface-1: #FFFFFF; --surface-2: #F1F5FB; --border: #D7E0EE;
             --text-1: #0B1220; --text-2: #334155; --text-3: #64748B;
@@ -52,7 +51,6 @@
         .kpi-value { font-size: 18px; font-weight: 700; color: var(--text-1); }
         .kpi-input { background: var(--surface-2); border: 1px solid var(--border); width: 75px; padding: 2px 5px; border-radius: 6px; font-weight: 600; font-size: 12px; }
 
-        /* --- TABLA ULTRA COMPACTA --- */
         .table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r-btn); }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { text-align: left; background: var(--surface-2); padding: 8px 12px; color: var(--text-3); font-weight: 600; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -60,9 +58,7 @@
         
         .tag { padding: 2px 8px; border-radius: var(--r-chip); font-size: 11px; font-weight: 600; }
         .tag.gray { background: var(--neutral-bg); color: var(--text-2); }
-        .status-icon { cursor: pointer; font-size: 16px; }
 
-        /* --- VISTA CONTABLE --- */
         .accounting-view { display: flex; gap: 15px; margin-top: 10px; }
         .acc-column { flex: 1; border: 1px solid var(--border); border-radius: var(--r-btn); background: var(--surface-1); overflow: hidden; }
         .acc-header { padding: 8px; text-align: center; color: white; font-weight: 600; font-size: 11px; }
@@ -71,7 +67,6 @@
         .acc-list { list-style: none; padding: 0; margin: 0; }
         .acc-item { display: flex; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--border); font-size: 12px; }
 
-        /* --- FORMULARIO --- */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } 
         .form-full { grid-column: span 2; }
         label { display: block; font-size: 10px; margin-bottom: 4px; font-weight: 600; color: var(--text-3); text-transform: uppercase; }
@@ -102,7 +97,7 @@
                 <span class="kpi-label">DÓLAR REF.</span>
                 <div style="display:flex; align-items:center; gap:5px;">
                     <span style="color:var(--text-3)">$</span>
-                    <input type="number" id="manualDolar" class="kpi-input" value="1200" onchange="updateDolar()">
+                    <input type="number" id="manualDolar" class="kpi-input" value="1200" onchange="updateDolarImpact()">
                 </div>
             </div>
             <div class="kpi-card green">
@@ -118,7 +113,7 @@
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h3 style="margin:0; font-size:14px;">Movimientos</h3>
-                <button class="btn-sec" onclick="toggleView()" id="viewBtn">Cuenta T</button>
+                <button class="btn-sec" onclick="toggleViewMode()" id="viewToggleBtn">Cuenta T</button>
             </div>
             <div id="view-list" class="table-wrapper">
                 <table>
@@ -126,7 +121,7 @@
                     <tbody id="list"></tbody>
                 </table>
             </div>
-            <div id="view-acc" class="accounting-view" style="display:none;">
+            <div id="view-accounting" class="accounting-view" style="display:none;">
                 <div class="acc-column"><div class="acc-header inc">INGRESOS</div><ul class="acc-list" id="acc-list-inc"></ul><div class="acc-total" id="acc-total-inc" style="padding:10px; text-align:right; font-weight:700; color:var(--success)"></div></div>
                 <div class="acc-column"><div class="acc-header exp">EGRESOS</div><ul class="acc-list" id="acc-list-exp"></ul><div class="acc-total" id="acc-total-exp" style="padding:10px; text-align:right; font-weight:700; color:var(--danger)"></div></div>
             </div>
@@ -140,161 +135,193 @@
                 <div class="form-grid">
                     <div class="form-full"><label>Fecha</label><input type="date" id="date" required></div>
                     <div class="form-full"><label style="display:flex; align-items:center; gap:8px; background:var(--surface-2); padding:8px; border-radius:10px; cursor:pointer"><input type="checkbox" id="executed" checked> Ejecutado</label></div>
-                    <div><label>Tipo</label><select id="type" onchange="upCat()"><option value="expense">Egreso</option><option value="income">Ingreso</option></select></div>
+                    <div><label>Tipo</label><select id="type" onchange="updateCategoryLogic()"><option value="expense">Egreso</option><option value="income">Ingreso</option></select></div>
                     <div><label>Monto</label><input type="number" id="amount" required step="0.01"></div>
                     <div class="form-full"><label>Categoría</label>
-                        <div style="display:flex; gap:5px"><select id="category" onchange="upCon()"></select><button type="button" class="btn-mini-del" onclick="delCat()"><i class="fas fa-trash"></i></button></div>
-                        <input type="text" id="customCat" placeholder="Nueva..." style="display:none; margin-top:5px">
+                        <div style="display:flex; gap:5px"><select id="category" onchange="updateConceptLogic()"></select><button type="button" class="btn-mini-del" onclick="deleteCurrentCategory()"><i class="fas fa-trash"></i></button></div>
+                        <input type="text" id="customCategoryInput" placeholder="Nueva..." style="display:none; margin-top:5px">
                     </div>
                     <div class="form-full"><label>Concepto</label>
-                        <div style="display:flex; gap:5px"><select id="conceptSelect" onchange="hCon()"></select><button type="button" class="btn-mini-del" onclick="delCon()"><i class="fas fa-trash"></i></button></div>
-                        <input type="text" id="customCon" placeholder="Nuevo..." style="display:none; margin-top:5px">
+                        <div style="display:flex; gap:5px"><select id="conceptSelect" onchange="handleConceptChange()"></select><button type="button" class="btn-mini-del" onclick="deleteCurrentConcept()"><i class="fas fa-trash"></i></button></div>
+                        <input type="text" id="customConceptInput" placeholder="Nuevo..." style="display:none; margin-top:5px">
                     </div>
                 </div>
-                <button type="submit" id="btn-sub" class="btn-main">Guardar</button>
-                <button type="button" id="btn-can" onclick="canEd()" style="display:none; width:100%; margin-top:5px;" class="btn-sec">Cancelar</button>
+                <button type="submit" id="btn-submit" class="btn-main">Guardar</button>
+                <button type="button" id="btn-cancel" onclick="cancelEdit()" style="display:none; width:100%; margin-top:5px;" class="btn-sec">Cancelar</button>
             </form>
         </div>
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center"><h3 style="font-size:13px; margin:0">Gastos</h3><button id="chart-res" onclick="resChart()" style="display:none" class="btn-sec">Volver</button></div>
+            <div style="display:flex; justify-content:space-between; align-items:center"><h3 style="font-size:13px; margin:0">Distribución</h3><button id="chart-reset-btn" onclick="resetChartLevel()" style="display:none" class="btn-sec">Volver</button></div>
             <div style="height:200px; margin-top:10px;"><canvas id="expenseChart"></canvas></div>
         </div>
         <div class="card" style="background:var(--surface-2); border:none;">
-            <div style="display:flex; gap:8px;"><button class="btn-sec" onclick="downData()" style="flex:1">Backup</button><input type="file" id="inFile" style="display:none" onchange="impData(this)"><button class="btn-sec" onclick="document.getElementById('inFile').click()" style="flex:1">Cargar</button></div>
+            <div style="display:flex; gap:8px;"><button class="btn-sec" onclick="downloadData()" style="flex:1">Backup</button><input type="file" id="importFile" style="display:none" onchange="importData(this)"><button class="btn-sec" onclick="document.getElementById('importFile').click()" style="flex:1">Cargar</button></div>
         </div>
     </div>
 </div>
 
 <script>
-    const def = {
-        cats: { income: ["Sueldo"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] },
-        cons: { "Sueldo": ["Javier", "Mary"], "Esenciales": ["Alquiler", "Super", "Luz", "Gas"], "Deudas": ["Tarjeta"], "Varios": ["Ocio"], "Ahorro": ["USD"] }
+    // RECUPERAMOS LOS NOMBRES DE VARIABLES ORIGINALES
+    const defaultData = {
+        categories: { income: ["Ingresos"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] },
+        concepts: { "Ingresos": ["Sueldo", "Ventas"], "Esenciales": ["Alquiler", "Super"], "Deudas": ["Tarjeta"], "Varios": ["Ocio"], "Ahorro": ["USD"] }
     };
-    let app = JSON.parse(localStorage.getItem('appData_v8')) || def;
-    let trans = JSON.parse(localStorage.getItem('transactions_v4')) || [];
-    let isAcc = false, edId = null, cLev = 'cat', cFil = null;
+    let appData = JSON.parse(localStorage.getItem('appData_v8')) || defaultData;
+    let transactions = JSON.parse(localStorage.getItem('transactions_v4')) || [];
+    let isAccountingView = false, editingId = null, chartLevel = 'category', chartFilterCategory = null;
 
     window.onload = () => {
         const t = new Date();
         document.getElementById('date').value = t.toISOString().split('T')[0];
         document.getElementById('currentMonth').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`;
-        upCat(); loadData();
+        updateCategoryLogic(); loadData();
     };
 
-    function upCat() {
-        const t = document.getElementById('type').value, s = document.getElementById('category');
-        s.innerHTML = '';
-        let c = t === 'income' ? app.cats.income : app.cats.expense;
-        [...c].sort().forEach(x => { const o = document.createElement('option'); o.value = x; o.text = x; s.add(o); });
-        const o = document.createElement('option'); o.value = 'Otro'; o.text = 'Otro'; s.add(o);
-        upCon();
+    function updateCategoryLogic() {
+        const type = document.getElementById('type').value;
+        const catSelect = document.getElementById('category');
+        catSelect.innerHTML = '';
+        let cats = type === 'income' ? appData.categories.income : appData.categories.expense;
+        [...cats].sort().forEach(c => {
+            const el = document.createElement('option'); el.value = c; el.innerText = c;
+            catSelect.appendChild(el);
+        });
+        const extra = document.createElement('option'); extra.value = 'Otro'; extra.innerText = 'Otro';
+        catSelect.appendChild(extra);
+        updateConceptLogic();
     }
 
-    function upCon() {
-        const c = document.getElementById('category').value, s = document.getElementById('conceptSelect');
-        s.innerHTML = '';
-        if(c === 'Otro') { document.getElementById('customCat').style.display = 'block'; }
-        else {
-            document.getElementById('customCat').style.display = 'none';
-            let n = app.cons[c] || [];
-            [...n].sort().forEach(x => { const o = document.createElement('option'); o.value = x; o.text = x; s.add(o); });
-            const o = document.createElement('option'); o.value = 'Otro'; o.text = 'Otro'; s.add(o);
+    function updateConceptLogic() {
+        const cat = document.getElementById('category').value;
+        const conceptSelect = document.getElementById('conceptSelect');
+        conceptSelect.innerHTML = '';
+        if(cat === 'Otro') {
+            document.getElementById('customCategoryInput').style.display = 'block';
+        } else {
+            document.getElementById('customCategoryInput').style.display = 'none';
+            let concepts = appData.concepts[cat] || [];
+            [...concepts].sort().forEach(c => {
+                const el = document.createElement('option'); el.value = c; el.innerText = c;
+                conceptSelect.appendChild(el);
+            });
+            const extra = document.createElement('option'); extra.value = 'Otro'; extra.innerText = 'Otro';
+            conceptSelect.appendChild(extra);
         }
-        hCon();
+        handleConceptChange();
     }
 
-    function hCon() { const v = document.getElementById('conceptSelect').value; document.getElementById('customCon').style.display = v === 'Otro' ? 'block' : 'none'; }
+    function handleConceptChange() {
+        const val = document.getElementById('conceptSelect').value;
+        document.getElementById('customConceptInput').style.display = val === 'Otro' ? 'block' : 'none';
+    }
 
     document.getElementById('form').onsubmit = (e) => {
         e.preventDefault();
-        const t = document.getElementById('type').value, a = document.getElementById('amount').value, d = document.getElementById('date').value;
-        let c = document.getElementById('category').value;
-        if(c === 'Otro') {
-            c = document.getElementById('customCat').value;
-            if(t === 'income') { if(!app.cats.income.includes(c)) app.cats.income.push(c); }
-            else { if(!app.cats.expense.includes(c)) app.cats.expense.push(c); }
-            app.cons[c] = [];
+        const type = document.getElementById('type').value, amount = document.getElementById('amount').value, dateStr = document.getElementById('date').value;
+        let cat = document.getElementById('category').value;
+        if(cat === 'Otro') {
+            cat = document.getElementById('customCategoryInput').value;
+            if(type === 'income') { if(!appData.categories.income.includes(cat)) appData.categories.income.push(cat); }
+            else { if(!appData.categories.expense.includes(cat)) appData.categories.expense.push(cat); }
+            appData.concepts[cat] = [];
         }
-        let n = document.getElementById('conceptSelect').value;
-        if(n === 'Otro') {
-            n = document.getElementById('customCon').value;
-            if(!app.cons[c].includes(n)) app.cons[c].push(n);
+        let concept = document.getElementById('conceptSelect').value;
+        if(concept === 'Otro') {
+            concept = document.getElementById('customConceptInput').value;
+            if(!appData.concepts[cat].includes(concept)) appData.concepts[cat].push(concept);
         }
-        localStorage.setItem('appData_v8', JSON.stringify(app));
-        const tr = { id: edId || Date.now(), date: d, monthKey: d.slice(0, 7), text: n, category: c, amount: t === 'expense' ? -Math.abs(a) : Math.abs(a), executed: document.getElementById('executed').checked };
-        if(edId) { const i = trans.findIndex(x => x.id === edId); trans[i] = tr; canEd(); }
-        else { trans.push(tr); }
-        localStorage.setItem('transactions_v4', JSON.stringify(trans));
+        localStorage.setItem('appData_v8', JSON.stringify(appData));
+        const transaction = {
+            id: editingId || Date.now(),
+            date: dateStr,
+            monthKey: dateStr.slice(0, 7),
+            text: concept,
+            category: cat,
+            amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
+            executed: document.getElementById('executed').checked
+        };
+        if(editingId) {
+            const idx = transactions.findIndex(t => t.id === editingId);
+            transactions[idx] = transaction;
+            cancelEdit();
+        } else {
+            transactions.push(transaction);
+        }
+        localStorage.setItem('transactions_v4', JSON.stringify(transactions));
         loadData();
     };
 
     function loadData() {
-        const m = document.getElementById('currentMonth').value, d = new Date(m + '-02');
+        const monthKey = document.getElementById('currentMonth').value;
+        const d = new Date(monthKey + '-02');
         document.getElementById('monthLabel').innerText = d.toLocaleString('es', { month: 'short', year: 'numeric' }).toUpperCase();
-        let f = trans.filter(x => x.monthKey === m).sort((a, b) => new Date(a.date) - new Date(b.date));
         
-        if(isAcc) renderAcc(f); else renderList(f);
+        let filtered = transactions.filter(t => t.monthKey === monthKey).sort((a,b) => new Date(a.date) - new Date(b.date));
         
-        const i = f.reduce((s, x) => x.amount > 0 ? s + x.amount : s, 0);
-        const e = f.reduce((s, x) => x.amount < 0 ? s + Math.abs(x.amount) : s, 0);
-        document.getElementById('month-balance').innerText = `$${(i - e).toLocaleString()}`;
-        document.getElementById('usd-savings').innerText = `US$ ${((i - e) > 0 ? (i - e) / parseInt(document.getElementById('manualDolar').value) : 0).toFixed(2)}`;
-        upChart(f);
+        if(isAccountingView) renderAccounting(filtered); else renderList(filtered);
+        
+        const inc = filtered.reduce((s, t) => t.amount > 0 ? s + t.amount : s, 0);
+        const exp = filtered.reduce((s, t) => t.amount < 0 ? s + Math.abs(t.amount) : s, 0);
+        document.getElementById('month-balance').innerText = `$${(inc - exp).toLocaleString()}`;
+        document.getElementById('usd-savings').innerText = `US$ ${((inc - exp) > 0 ? (inc - exp) / parseInt(document.getElementById('manualDolar').value) : 0).toFixed(2)}`;
+        updateChart(filtered);
     }
 
-    function renderList(f) {
-        const l = document.getElementById('list'); l.innerHTML = '';
-        f.forEach(x => {
-            const r = l.insertRow();
-            r.innerHTML = `
-                <td style="text-align:center"><i class="fas ${x.executed ? 'fa-check-circle' : 'fa-clock'}" onclick="tog(${x.id})" style="color:${x.executed ? '#16A34A' : '#CCC'}; cursor:pointer"></i></td>
-                <td>${x.date.slice(8,10)}</td>
-                <td><span class="tag gray">${x.category}</span></td>
-                <td>${x.text}</td>
-                <td style="text-align:right; font-weight:700; color:${x.amount < 0 ? '#0B1220' : '#16A34A'}">$${Math.abs(x.amount).toLocaleString()}</td>
-                <td style="text-align:center"><i class="fas fa-edit" onclick="ed(${x.id})" style="color:var(--warning); cursor:pointer; margin-right:10px"></i><i class="fas fa-trash" onclick="rm(${x.id})" style="color:var(--danger); cursor:pointer"></i></td>
+    function renderList(filtered) {
+        const list = document.getElementById('list'); list.innerHTML = '';
+        filtered.forEach(t => {
+            const row = list.insertRow();
+            row.innerHTML = `
+                <td style="text-align:center"><i class="fas ${t.executed ? 'fa-check-circle' : 'fa-clock'}" onclick="toggleStatus(${t.id})" style="color:${t.executed ? '#16A34A' : '#CCC'}; cursor:pointer"></i></td>
+                <td>${t.date.slice(8,10)}</td>
+                <td><span class="tag gray">${t.category}</span></td>
+                <td>${t.text}</td>
+                <td style="text-align:right; font-weight:700; color:${t.amount < 0 ? '#0B1220' : '#16A34A'}">$${Math.abs(t.amount).toLocaleString()}</td>
+                <td style="text-align:center"><i class="fas fa-edit" onclick="startEdit(${t.id})" style="color:var(--warning); cursor:pointer; margin-right:10px"></i><i class="fas fa-trash" onclick="removeTransaction(${t.id})" style="color:var(--danger); cursor:pointer"></i></td>
             `;
         });
     }
 
-    function renderAcc(f) {
+    function renderAccounting(filtered) {
         const lI = document.getElementById('acc-list-inc'), lE = document.getElementById('acc-list-exp');
         lI.innerHTML = ''; lE.innerHTML = '';
         let tI = 0, tE = 0;
-        f.forEach(x => {
-            const li = `<li class="acc-item"><span>${x.text}</span><b>$${Math.abs(x.amount).toLocaleString()}</b></li>`;
-            if(x.amount > 0) { lI.innerHTML += li; tI += x.amount; }
-            else { lE.innerHTML += li; tE += Math.abs(x.amount); }
+        filtered.forEach(t => {
+            const li = `<li class="acc-item"><span>${t.text}</span><b>$${Math.abs(t.amount).toLocaleString()}</b></li>`;
+            if(t.amount > 0) { lI.innerHTML += li; tI += t.amount; }
+            else { lE.innerHTML += li; tE += Math.abs(t.amount); }
         });
         document.getElementById('acc-total-inc').innerText = `$${tI.toLocaleString()}`;
         document.getElementById('acc-total-exp').innerText = `$${tE.toLocaleString()}`;
     }
 
-    let myC = null;
-    function upChart(f) {
+    let myChart = null;
+    function updateChart(filtered) {
         const ctx = document.getElementById('expenseChart').getContext('2d');
-        const inc = f.reduce((s, x) => x.amount > 0 ? s + x.amount : s, 0);
-        const exp = f.filter(x => x.amount < 0);
+        const incomeTotal = filtered.reduce((s, t) => t.amount > 0 ? s + t.amount : s, 0);
+        const expenses = filtered.filter(t => t.amount < 0);
         let l = [], v = [], c = [];
-        const g = {}; exp.forEach(x => { g[x.category] = (g[x.category] || 0) + Math.abs(x.amount); });
-        l = Object.keys(g); v = Object.values(g);
-        const bal = inc - v.reduce((a, b) => a + b, 0);
-        if(bal > 0) { l.push("Saldo"); v.push(bal); }
+        const groups = {}; expenses.forEach(t => { groups[t.category] = (groups[t.category] || 0) + Math.abs(t.amount); });
+        l = Object.keys(groups); v = Object.values(groups);
+        const remaining = incomeTotal - v.reduce((a, b) => a + b, 0);
+        if(remaining > 0) { l.push("Saldo"); v.push(remaining); }
         c = l.map(x => x === 'Saldo' ? '#E2E8F0' : '#3B82F6');
-        if(myC) myC.destroy();
-        myC = new Chart(ctx, { type: 'doughnut', data: { labels: l, datasets: [{ data: v, backgroundColor: c, borderWidth: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, { type: 'doughnut', data: { labels: l, datasets: [{ data: v, backgroundColor: c, borderWidth: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } } });
     }
 
-    function changeMonth(s) { const i = document.getElementById('currentMonth'), [y, m] = i.value.split('-').map(Number); const d = new Date(y, m - 1 + s, 1); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; loadData(); }
-    function tog(id) { const i = trans.findIndex(x => x.id === id); trans[i].executed = !trans[i].executed; save(); loadData(); }
-    function rm(id) { if(confirm('¿Borrar?')) { trans = trans.filter(x => x.id !== id); save(); loadData(); } }
-    function ed(id) { const x = trans.find(t => t.id === id); edId = id; document.getElementById('date').value = x.date; document.getElementById('amount').value = Math.abs(x.amount); document.getElementById('type').value = x.amount > 0 ? 'income' : 'expense'; upCat(); document.getElementById('category').value = x.category; upCon(); document.getElementById('conceptSelect').value = x.text; document.getElementById('btn-sub').innerText = 'Actualizar'; document.getElementById('btn-can').style.display = 'block'; }
-    function canEd() { edId = null; document.getElementById('form').reset(); document.getElementById('btn-sub').innerText = 'Guardar'; document.getElementById('btn-can').style.display = 'none'; }
-    function save() { localStorage.setItem('transactions_v4', JSON.stringify(trans)); }
-    function updateDolar() { loadData(); }
-    function toggleView() { isAcc = !isAcc; document.getElementById('view-list').style.display = isAcc ? 'none' : 'block'; document.getElementById('view-acc').style.display = isAcc ? 'flex' : 'none'; document.getElementById('viewBtn').innerText = isAcc ? 'Lista' : 'Cuenta T'; loadData(); }
-    function downData() { const d = encodeURIComponent(JSON.stringify({ trans, app })); const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + d; a.download = "finanzas_backup.json"; a.click(); }
-    function impData(i) { const f = i.files[0], r = new FileReader(); r.onload = (e) => { const d = JSON.parse(e.target.result); trans = d.trans; app = d.app; save(); localStorage.setItem('appData_v8', JSON.stringify(app)); loadData(); }; r.readAsText(f); }
+    function changeMonth(step) { const i = document.getElementById('currentMonth'), [y, m] = i.value.split('-').map(Number); const d = new Date(y, m - 1 + step, 1); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; loadData(); }
+    function toggleStatus(id) { const t = transactions.find(x => x.id === id); t.executed = !t.executed; localStorage.setItem('transactions_v4', JSON.stringify(transactions)); loadData(); }
+    function removeTransaction(id) { if(confirm('¿Borrar?')) { transactions = transactions.filter(t => t.id !== id); localStorage.setItem('transactions_v4', JSON.stringify(transactions)); loadData(); } }
+    function startEdit(id) { const t = transactions.find(x => x.id === id); editingId = id; document.getElementById('date').value = t.date; document.getElementById('amount').value = Math.abs(t.amount); document.getElementById('type').value = t.amount > 0 ? 'income' : 'expense'; updateCategoryLogic(); document.getElementById('category').value = t.category; updateConceptLogic(); document.getElementById('conceptSelect').value = t.text; document.getElementById('btn-submit').innerText = 'Actualizar'; document.getElementById('btn-cancel').style.display = 'block'; }
+    function cancelEdit() { editingId = null; document.getElementById('form').reset(); document.getElementById('btn-submit').innerText = 'Guardar'; document.getElementById('btn-cancel').style.display = 'none'; }
+    function updateDolarImpact() { loadData(); }
+    function toggleViewMode() { isAccountingView = !isAccountingView; document.getElementById('view-list').style.display = isAccountingView ? 'none' : 'block'; document.getElementById('view-accounting').style.display = isAccountingView ? 'flex' : 'none'; document.getElementById('viewToggleBtn').innerText = isAccountingView ? 'Lista' : 'Cuenta T'; loadData(); }
+    function downloadData() { const d = encodeURIComponent(JSON.stringify({ transactions, appData })); const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + d; a.download = "finanzas_backup.json"; a.click(); }
+    function importData(inp) { const f = inp.files[0], r = new FileReader(); r.onload = (e) => { const d = JSON.parse(e.target.result); transactions = d.transactions; appData = d.appData; localStorage.setItem('transactions_v4', JSON.stringify(transactions)); localStorage.setItem('appData_v8', JSON.stringify(appData)); loadData(); }; r.readAsText(f); }
+    function deleteCurrentCategory() { /* Opcional: implementar borrado */ }
+    function deleteCurrentConcept() { /* Opcional: implementar borrado */ }
+    function resetChartLevel() { /* Opcional: volver niveles chart */ }
 </script>
 </body>
 </html>
