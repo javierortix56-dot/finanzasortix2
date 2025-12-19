@@ -14,66 +14,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* --- DISEÑO ORIGINAL COMPACTO RECUPERADO --- */
+        /* --- ESTILOS MOBILE OPTIMIZED V11 --- */
         :root {
-            --bg-app: #F7F9FC; --surface-1: #FFFFFF; --surface-2: #F1F5FB; --border: #D7E0EE;
-            --text-1: #0B1220; --text-2: #334155; --text-3: #64748B;
-            --primary: #2563EB; --primary-hover: #1D4ED8; --success: #16A34A; --danger: #DC2626;
-            --warning: #D97706; --info: #0284C7; --success-bg: #EAF7EF; --danger-bg: #FDECEC; 
-            --warning-bg: #FFF4E5; --info-bg: #E7F6FD; --neutral-bg: #F1F5F9;
-            --r-card: 16px; --r-btn: 12px; --r-input: 10px; --r-chip: 999px;
+            --bg: #F0F4F8; --card: #FFFFFF; --border: #D1D9E6;
+            --text-1: #101828; --text-2: #475467; --text-3: #98A2B3;
+            --primary: #3B82F6; --success: #10B981; --danger: #EF4444; --warn: #F59E0B;
+            --r-card: 14px; --r-in: 8px;
         }
 
-        * { box-sizing: border-box; outline: none; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-1); margin: 0; padding: 15px; font-size: 13px; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-1); margin: 0; padding: 12px; font-size: 13px; }
 
-        .grid-container { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1400px; margin: 0 auto; align-items: start; }
-        @media (max-width: 900px) { .grid-container { grid-template-columns: 1fr; } }
+        /* LAYOUT PRINCIPAL */
+        .grid-container { display: flex; flex-direction: column-reverse; gap: 15px; max-width: 600px; margin: 0 auto; }
+        @media (min-width: 900px) { .grid-container { display: grid; grid-template-columns: 1fr 340px; align-items: start; flex-direction: unset; } }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-card); padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
         
-        .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--r-card); padding: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        /* TOP BAR */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--card); padding: 8px 14px; border-radius: var(--r-card); border: 1px solid var(--border); }
+        .app-title { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 700; font-size: 1.1em; }
+        .month-nav { display: flex; align-items: center; gap: 2px; background: #F1F5F9; padding: 2px; border-radius: 8px; }
+        .month-nav button { border: none; background: transparent; padding: 6px 10px; font-size: 14px; color: var(--text-2); }
+        .month-display { position: relative; width: 85px; text-align: center; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+        #currentMonth { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
+
+        /* KPIs */
+        .kpi-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .kpi-card { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 12px; text-align: center; }
+        .kpi-label { font-size: 9px; color: var(--text-3); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 2px; }
+        .kpi-value { font-size: 15px; font-weight: 700; }
+        .kpi-input { border: 1px solid var(--border); width: 100%; text-align: center; font-weight: 600; font-size: 12px; border-radius: 4px; padding: 2px; color: var(--text-2); }
+
+        /* FORMULARIO COMPACTO (2 FILAS) */
+        .form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .form-col { flex: 1; }
+        .form-col.small { flex: 0.6; }
+        label { display: block; font-size: 9px; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 3px; }
+        input, select { width: 100%; height: 34px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r-in); font-size: 13px; background: #FFF; }
         
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--surface-1); padding: 10px 20px; border-radius: var(--r-card); border: 1px solid var(--border); }
-        .app-title { display: flex; align-items: center; gap: 10px; color: var(--primary); font-weight: 700; font-size: 1.1em; }
-
-        .month-nav { display: flex; align-items: center; gap: 4px; background: var(--surface-2); padding: 3px; border-radius: var(--r-btn); border: 1px solid var(--border); }
-        .month-nav button { border: none; background: transparent; cursor: pointer; color: var(--text-2); padding: 6px 8px; border-radius: 6px; }
+        .check-btn { display: flex; align-items: center; justify-content: center; height: 34px; border: 1px solid var(--border); border-radius: var(--r-in); background: #FFF; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text-2); }
+        .check-btn input { width: auto; height: auto; margin: 0; }
         
-        .month-display-wrapper { position: relative; width: 95px; height: 28px; display: flex; align-items: center; justify-content: center; }
-        #monthLabel { font-weight: 700; font-size: 11px; color: var(--text-1); text-transform: uppercase; pointer-events: none; }
-        #currentMonth { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .btn-main { background: var(--primary); color: white; border: none; width: 100%; border-radius: var(--r-in); font-weight: 600; height: 38px; font-size: 13px; margin-top: 4px; }
+        .btn-mini { background: #fee2e2; color: #DC2626; border: none; width: 20px; border-radius: 4px; margin-left: 4px; font-size: 10px; }
 
-        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .kpi-card { background: var(--surface-1); border: 1px solid var(--border); padding: 12px; border-radius: var(--r-card); border-left: 4px solid var(--border); }
-        .kpi-card.blue { border-left-color: var(--primary); }
-        .kpi-card.green { border-left-color: var(--success); }
-        .kpi-card.info { border-left-color: var(--info); }
-        .kpi-label { font-size: 10px; color: var(--text-3); font-weight: 700; text-transform: uppercase; }
-        .kpi-value { font-size: 18px; font-weight: 700; color: var(--text-1); }
-        .kpi-input { background: var(--surface-2); border: 1px solid var(--border); width: 75px; padding: 2px 5px; border-radius: 6px; font-weight: 600; font-size: 12px; }
-
-        .table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r-btn); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; background: var(--surface-2); padding: 8px 12px; color: var(--text-3); font-weight: 600; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
-        td { padding: 6px 12px; border-bottom: 1px solid var(--border); color: var(--text-2); font-size: 13px; white-space: nowrap; height: 38px; vertical-align: middle; }
+        /* TABLA Y LISTA */
+        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { text-align: left; background: #F8FAFC; padding: 6px 10px; color: var(--text-3); font-size: 9px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 12px; white-space: nowrap; height: 32px; }
+        .tag { padding: 2px 6px; border-radius: 99px; font-size: 10px; font-weight: 600; background: #F1F5F9; color: var(--text-2); }
         
-        .tag { padding: 2px 8px; border-radius: var(--r-chip); font-size: 11px; font-weight: 600; }
-        .tag.gray { background: var(--neutral-bg); color: var(--text-2); }
+        /* GRÁFICO */
+        .chart-container { position: relative; height: 180px; width: 100%; margin-top: 5px; }
 
-        .accounting-view { display: flex; gap: 15px; margin-top: 10px; }
-        .acc-column { flex: 1; border: 1px solid var(--border); border-radius: var(--r-btn); background: var(--surface-1); overflow: hidden; }
-        .acc-header { padding: 8px; text-align: center; color: white; font-weight: 600; font-size: 11px; }
-        .acc-header.inc { background: var(--success); }
-        .acc-header.exp { background: var(--danger); }
-        .acc-list { list-style: none; padding: 0; margin: 0; }
-        .acc-item { display: flex; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--border); font-size: 12px; }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } 
-        .form-full { grid-column: span 2; }
-        label { display: block; font-size: 10px; margin-bottom: 4px; font-weight: 600; color: var(--text-3); text-transform: uppercase; }
-        input, select { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-input); font-size: 13px; }
-        .btn-main { background: var(--primary); color: white; border: none; width: 100%; border-radius: var(--r-btn); cursor: pointer; font-weight: 600; height: 40px; margin-top: 10px; }
-        .btn-sec { background: white; border: 1px solid var(--border); color: var(--text-2); border-radius: var(--r-btn); height: 34px; cursor: pointer; font-size: 11px; }
-        .btn-mini-del { background: var(--danger-bg); color: var(--danger); border: none; border-radius: 8px; width: 36px; cursor: pointer; }
+        /* BACKUP SECTION */
+        .tools { display: flex; gap: 8px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .btn-sec { flex: 1; background: #FFF; border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text-2); }
     </style>
 </head>
 <body>
@@ -81,247 +79,226 @@
 <div class="top-bar">
     <div class="app-title"><i class="fas fa-wallet"></i> <span>Javier & Mary</span></div>
     <div class="month-nav">
-        <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="month-display-wrapper">
-            <span id="monthLabel"></span> 
-            <input type="month" id="currentMonth" onchange="loadData()"> 
+        <button onclick="chMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="month-display">
+            <span id="monthLabel">DIC 2025</span>
+            <input type="month" id="currentMonth" onchange="load()">
         </div>
-        <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+        <button onclick="chMonth(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
 
 <div class="grid-container">
-    <div class="main-col">
+    
+    <div class="sidebar">
+        
         <div class="kpi-row">
-            <div class="kpi-card blue">
-                <span class="kpi-label">DÓLAR REF.</span>
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <span style="color:var(--text-3)">$</span>
-                    <input type="number" id="manualDolar" class="kpi-input" value="1200" onchange="updateDolarImpact()">
-                </div>
+            <div class="kpi-card" style="border-bottom: 3px solid var(--primary)">
+                <span class="kpi-label">Dólar</span>
+                <input type="number" id="manualDolar" class="kpi-input" value="1200" onchange="saveDolar()">
             </div>
-            <div class="kpi-card green">
+            <div class="kpi-card" style="border-bottom: 3px solid var(--success)">
                 <span class="kpi-label">Balance</span>
-                <div class="kpi-value" id="month-balance">$0</div>
+                <div class="kpi-value" id="val-bal">$0</div>
             </div>
-            <div class="kpi-card info">
+            <div class="kpi-card" style="border-bottom: 3px solid var(--warn)">
                 <span class="kpi-label">Ahorro USD</span>
-                <div class="kpi-value" id="usd-savings" style="color:var(--info)">$0</div>
+                <div class="kpi-value" id="val-usd" style="color:var(--warn)">$0</div>
             </div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0; font-size:14px;">Movimientos</h3>
-                <button class="btn-sec" onclick="toggleViewMode()" id="viewToggleBtn">Cuenta T</button>
+            <h3 style="margin:0 0 10px 0; font-size:13px; color:var(--text-2);">Nuevo Registro</h3>
+            <form id="form">
+                <div class="form-row">
+                    <div class="form-col"><input type="date" id="date" required></div>
+                    <div class="form-col small">
+                        <label class="check-btn"><input type="checkbox" id="executed" checked> Pagado</label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col small">
+                        <select id="type" onchange="upCat()">
+                            <option value="expense">Egreso</option>
+                            <option value="income">Ingreso</option>
+                        </select>
+                    </div>
+                    <div class="form-col"><input type="number" id="amount" placeholder="$ Monto" required step="0.01"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div style="display:flex"><select id="category" onchange="upCon()"></select></div>
+                        <input id="customCat" placeholder="Nueva Cat..." style="display:none; margin-top:4px">
+                    </div>
+                    <div class="form-col">
+                        <div style="display:flex"><select id="conceptSelect" onchange="hCon()"></select></div>
+                        <input id="customCon" placeholder="Nuevo Con..." style="display:none; margin-top:4px">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-submit" class="btn-main">Guardar</button>
+                <button type="button" id="btn-cancel" onclick="cancelEdit()" style="display:none; margin-top:5px; background:#fff; color:#666; border:1px solid #ddd;" class="btn-main">Cancelar Edición</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between;">
+                <h3 style="margin:0; font-size:13px; color:var(--text-2)">Distribución</h3>
             </div>
-            <div id="view-list" class="table-wrapper">
-                <table>
-                    <thead><tr><th width="40"></th><th>Fecha</th><th>Cat.</th><th>Concepto</th><th style="text-align:right">Monto</th><th width="60"></th></tr></thead>
-                    <tbody id="list"></tbody>
-                </table>
-            </div>
-            <div id="view-accounting" class="accounting-view" style="display:none;">
-                <div class="acc-column"><div class="acc-header inc">INGRESOS</div><ul class="acc-list" id="acc-list-inc"></ul><div class="acc-total" id="acc-total-inc" style="padding:10px; text-align:right; font-weight:700; color:var(--success)"></div></div>
-                <div class="acc-column"><div class="acc-header exp">EGRESOS</div><ul class="acc-list" id="acc-list-exp"></ul><div class="acc-total" id="acc-total-exp" style="padding:10px; text-align:right; font-weight:700; color:var(--danger)"></div></div>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="sidebar">
+    <div class="main-col">
         <div class="card">
-            <h3 style="font-size:14px; margin-top:0">Nuevo Registro</h3>
-            <form id="form">
-                <div class="form-grid">
-                    <div class="form-full"><label>Fecha</label><input type="date" id="date" required></div>
-                    <div class="form-full"><label style="display:flex; align-items:center; gap:8px; background:var(--surface-2); padding:8px; border-radius:10px; cursor:pointer"><input type="checkbox" id="executed" checked> Ejecutado</label></div>
-                    <div><label>Tipo</label><select id="type" onchange="updateCategoryLogic()"><option value="expense">Egreso</option><option value="income">Ingreso</option></select></div>
-                    <div><label>Monto</label><input type="number" id="amount" required step="0.01"></div>
-                    <div class="form-full"><label>Categoría</label>
-                        <div style="display:flex; gap:5px"><select id="category" onchange="updateConceptLogic()"></select><button type="button" class="btn-mini-del" onclick="deleteCurrentCategory()"><i class="fas fa-trash"></i></button></div>
-                        <input type="text" id="customCategoryInput" placeholder="Nueva..." style="display:none; margin-top:5px">
-                    </div>
-                    <div class="form-full"><label>Concepto</label>
-                        <div style="display:flex; gap:5px"><select id="conceptSelect" onchange="handleConceptChange()"></select><button type="button" class="btn-mini-del" onclick="deleteCurrentConcept()"><i class="fas fa-trash"></i></button></div>
-                        <input type="text" id="customConceptInput" placeholder="Nuevo..." style="display:none; margin-top:5px">
-                    </div>
-                </div>
-                <button type="submit" id="btn-submit" class="btn-main">Guardar</button>
-                <button type="button" id="btn-cancel" onclick="cancelEdit()" style="display:none; width:100%; margin-top:5px;" class="btn-sec">Cancelar</button>
-            </form>
-        </div>
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center"><h3 style="font-size:13px; margin:0">Distribución</h3><button id="chart-reset-btn" onclick="resetChartLevel()" style="display:none" class="btn-sec">Volver</button></div>
-            <div style="height:200px; margin-top:10px;"><canvas id="expenseChart"></canvas></div>
-        </div>
-        <div class="card" style="background:var(--surface-2); border:none;">
-            <div style="display:flex; gap:8px;"><button class="btn-sec" onclick="downloadData()" style="flex:1">Backup</button><input type="file" id="importFile" style="display:none" onchange="importData(this)"><button class="btn-sec" onclick="document.getElementById('importFile').click()" style="flex:1">Cargar</button></div>
+            <h3 style="margin:0; font-size:13px; color:var(--text-2)">Movimientos del Mes</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th width="30"></th><th>Fecha</th><th>Cat</th><th>Concepto</th><th style="text-align:right">$$$</th><th style="text-align:center">Act</th></tr></thead>
+                    <tbody id="list"></tbody>
+                </table>
+            </div>
+            
+            <div class="tools">
+                <button class="btn-sec" onclick="dl()">⬇ Backup</button>
+                <input type="file" id="ul" style="display:none" onchange="ul(this)">
+                <button class="btn-sec" onclick="document.getElementById('ul').click()">⬆ Cargar</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // RECUPERAMOS LOS NOMBRES DE VARIABLES ORIGINALES
-    const defaultData = {
-        categories: { income: ["Ingresos"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] },
-        concepts: { "Ingresos": ["Sueldo", "Ventas"], "Esenciales": ["Alquiler", "Super"], "Deudas": ["Tarjeta"], "Varios": ["Ocio"], "Ahorro": ["USD"] }
-    };
-    let appData = JSON.parse(localStorage.getItem('appData_v8')) || defaultData;
+    // --- DATOS Y VARIABLES ---
+    const def = { cats: { income: ["Ingresos"], expense: ["Esenciales", "Deudas", "Varios", "Ahorro"] }, cons: { "Ingresos":["Sueldo"], "Esenciales":["Alquiler","Super"], "Deudas":["Tarjeta"], "Varios":["Salidas"], "Ahorro":["USD"] } };
+    // Usamos nombres originales para compatibilidad con backup
+    let appData = JSON.parse(localStorage.getItem('appData_v8')) || def;
     let transactions = JSON.parse(localStorage.getItem('transactions_v4')) || [];
-    let isAccountingView = false, editingId = null, chartLevel = 'category', chartFilterCategory = null;
+    let editingId = null;
+    // Paleta de colores vivos para el gráfico
+    const palette = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316', '#06B6D4', '#EC4899'];
 
+    // --- INICIALIZACIÓN ---
     window.onload = () => {
         const t = new Date();
         document.getElementById('date').value = t.toISOString().split('T')[0];
-        document.getElementById('currentMonth').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`;
-        updateCategoryLogic(); loadData();
+        document.getElementById('currentMonth').value = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
+        upCat(); load();
     };
 
-    function updateCategoryLogic() {
-        const type = document.getElementById('type').value;
-        const catSelect = document.getElementById('category');
-        catSelect.innerHTML = '';
-        let cats = type === 'income' ? appData.categories.income : appData.categories.expense;
-        [...cats].sort().forEach(c => {
-            const el = document.createElement('option'); el.value = c; el.innerText = c;
-            catSelect.appendChild(el);
-        });
-        const extra = document.createElement('option'); extra.value = 'Otro'; extra.innerText = 'Otro';
-        catSelect.appendChild(extra);
-        updateConceptLogic();
+    // --- LÓGICA DE FORMULARIO ---
+    function upCat() {
+        const t = document.getElementById('type').value, s = document.getElementById('category'); s.innerHTML='';
+        let c = t==='income'?appData.cats.income:appData.cats.expense;
+        [...c].sort().forEach(x=>{let o=document.createElement('option');o.value=x;o.text=x;s.add(o)});
+        s.add(new Option('Otro','Otro')); upCon();
     }
-
-    function updateConceptLogic() {
-        const cat = document.getElementById('category').value;
-        const conceptSelect = document.getElementById('conceptSelect');
-        conceptSelect.innerHTML = '';
-        if(cat === 'Otro') {
-            document.getElementById('customCategoryInput').style.display = 'block';
-        } else {
-            document.getElementById('customCategoryInput').style.display = 'none';
-            let concepts = appData.concepts[cat] || [];
-            [...concepts].sort().forEach(c => {
-                const el = document.createElement('option'); el.value = c; el.innerText = c;
-                conceptSelect.appendChild(el);
-            });
-            const extra = document.createElement('option'); extra.value = 'Otro'; extra.innerText = 'Otro';
-            conceptSelect.appendChild(extra);
+    function upCon() {
+        const c=document.getElementById('category').value, s=document.getElementById('conceptSelect'); s.innerHTML='';
+        if(c==='Otro') document.getElementById('customCat').style.display='block';
+        else {
+            document.getElementById('customCat').style.display='none';
+            (appData.cons[c]||[]).sort().forEach(x=>s.add(new Option(x,x)));
+            s.add(new Option('Otro','Otro'));
         }
-        handleConceptChange();
+        hCon();
     }
+    function hCon() { document.getElementById('customCon').style.display = document.getElementById('conceptSelect').value==='Otro'?'block':'none'; }
 
-    function handleConceptChange() {
-        const val = document.getElementById('conceptSelect').value;
-        document.getElementById('customConceptInput').style.display = val === 'Otro' ? 'block' : 'none';
-    }
-
+    // --- GUARDAR ---
     document.getElementById('form').onsubmit = (e) => {
         e.preventDefault();
-        const type = document.getElementById('type').value, amount = document.getElementById('amount').value, dateStr = document.getElementById('date').value;
-        let cat = document.getElementById('category').value;
-        if(cat === 'Otro') {
-            cat = document.getElementById('customCategoryInput').value;
-            if(type === 'income') { if(!appData.categories.income.includes(cat)) appData.categories.income.push(cat); }
-            else { if(!appData.categories.expense.includes(cat)) appData.categories.expense.push(cat); }
-            appData.concepts[cat] = [];
-        }
-        let concept = document.getElementById('conceptSelect').value;
-        if(concept === 'Otro') {
-            concept = document.getElementById('customConceptInput').value;
-            if(!appData.concepts[cat].includes(concept)) appData.concepts[cat].push(concept);
-        }
-        localStorage.setItem('appData_v8', JSON.stringify(appData));
-        const transaction = {
-            id: editingId || Date.now(),
-            date: dateStr,
-            monthKey: dateStr.slice(0, 7),
-            text: concept,
-            category: cat,
-            amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-            executed: document.getElementById('executed').checked
-        };
-        if(editingId) {
-            const idx = transactions.findIndex(t => t.id === editingId);
-            transactions[idx] = transaction;
-            cancelEdit();
-        } else {
-            transactions.push(transaction);
-        }
-        localStorage.setItem('transactions_v4', JSON.stringify(transactions));
-        loadData();
+        const type=document.getElementById('type').value, amt=document.getElementById('amount').value, date=document.getElementById('date').value;
+        let cat=document.getElementById('category').value, con=document.getElementById('conceptSelect').value;
+        
+        if(cat==='Otro'){ cat=document.getElementById('customCat').value; if(type==='income'){if(!appData.cats.income.includes(cat))appData.cats.income.push(cat)}else{if(!appData.cats.expense.includes(cat))appData.cats.expense.push(cat)} appData.cons[cat]=[]; }
+        if(con==='Otro'){ con=document.getElementById('customCon').value; if(!appData.cons[cat].includes(con))appData.cons[cat].push(con); }
+        
+        localStorage.setItem('appData_v8',JSON.stringify(appData));
+        const tr = { id: editingId||Date.now(), date: date, monthKey: date.slice(0,7), text: con, category: cat, amount: type==='expense'?-Math.abs(amt):Math.abs(amt), executed: document.getElementById('executed').checked };
+        
+        if(editingId){ transactions[transactions.findIndex(x=>x.id===editingId)]=tr; cancelEdit(); } else { transactions.push(tr); }
+        localStorage.setItem('transactions_v4',JSON.stringify(transactions));
+        load();
     };
 
-    function loadData() {
-        const monthKey = document.getElementById('currentMonth').value;
-        const d = new Date(monthKey + '-02');
-        document.getElementById('monthLabel').innerText = d.toLocaleString('es', { month: 'short', year: 'numeric' }).toUpperCase();
+    // --- RENDERIZADO ---
+    function load() {
+        const mk = document.getElementById('currentMonth').value;
+        const d = new Date(mk+'-02');
+        document.getElementById('monthLabel').innerText = d.toLocaleString('es',{month:'short',year:'numeric'}).toUpperCase();
         
-        let filtered = transactions.filter(t => t.monthKey === monthKey).sort((a,b) => new Date(a.date) - new Date(b.date));
+        let f = transactions.filter(t=>t.monthKey===mk).sort((a,b)=>new Date(a.date)-new Date(b.date));
         
-        if(isAccountingView) renderAccounting(filtered); else renderList(filtered);
-        
-        const inc = filtered.reduce((s, t) => t.amount > 0 ? s + t.amount : s, 0);
-        const exp = filtered.reduce((s, t) => t.amount < 0 ? s + Math.abs(t.amount) : s, 0);
-        document.getElementById('month-balance').innerText = `$${(inc - exp).toLocaleString()}`;
-        document.getElementById('usd-savings').innerText = `US$ ${((inc - exp) > 0 ? (inc - exp) / parseInt(document.getElementById('manualDolar').value) : 0).toFixed(2)}`;
-        updateChart(filtered);
-    }
-
-    function renderList(filtered) {
-        const list = document.getElementById('list'); list.innerHTML = '';
-        filtered.forEach(t => {
-            const row = list.insertRow();
-            row.innerHTML = `
-                <td style="text-align:center"><i class="fas ${t.executed ? 'fa-check-circle' : 'fa-clock'}" onclick="toggleStatus(${t.id})" style="color:${t.executed ? '#16A34A' : '#CCC'}; cursor:pointer"></i></td>
-                <td>${t.date.slice(8,10)}</td>
-                <td><span class="tag gray">${t.category}</span></td>
-                <td>${t.text}</td>
-                <td style="text-align:right; font-weight:700; color:${t.amount < 0 ? '#0B1220' : '#16A34A'}">$${Math.abs(t.amount).toLocaleString()}</td>
-                <td style="text-align:center"><i class="fas fa-edit" onclick="startEdit(${t.id})" style="color:var(--warning); cursor:pointer; margin-right:10px"></i><i class="fas fa-trash" onclick="removeTransaction(${t.id})" style="color:var(--danger); cursor:pointer"></i></td>
-            `;
+        // Tabla
+        const l = document.getElementById('list'); l.innerHTML='';
+        f.forEach(t => {
+            let row = l.insertRow();
+            row.innerHTML = `<td style="text-align:center"><i class="fas ${t.executed?'fa-check-circle':'fa-clock'}" style="color:${t.executed?'var(--success)':'#CBD5E1'};cursor:pointer" onclick="tog(${t.id})"></i></td>
+            <td>${t.date.slice(8,10)}</td>
+            <td><span class="tag">${t.category.slice(0,10)}</span></td>
+            <td>${t.text}</td>
+            <td style="text-align:right;font-weight:700;color:${t.amount<0?'var(--text-1)':'var(--success)'}">$${Math.abs(t.amount).toLocaleString()}</td>
+            <td style="text-align:center"><i class="fas fa-pen" onclick="ed(${t.id})" style="color:var(--warn);cursor:pointer;font-size:12px;margin-right:8px"></i><i class="fas fa-trash" onclick="del(${t.id})" style="color:var(--danger);cursor:pointer;font-size:12px"></i></td>`;
         });
-    }
 
-    function renderAccounting(filtered) {
-        const lI = document.getElementById('acc-list-inc'), lE = document.getElementById('acc-list-exp');
-        lI.innerHTML = ''; lE.innerHTML = '';
-        let tI = 0, tE = 0;
-        filtered.forEach(t => {
-            const li = `<li class="acc-item"><span>${t.text}</span><b>$${Math.abs(t.amount).toLocaleString()}</b></li>`;
-            if(t.amount > 0) { lI.innerHTML += li; tI += t.amount; }
-            else { lE.innerHTML += li; tE += Math.abs(t.amount); }
-        });
-        document.getElementById('acc-total-inc').innerText = `$${tI.toLocaleString()}`;
-        document.getElementById('acc-total-exp').innerText = `$${tE.toLocaleString()}`;
+        // Totales
+        const inc = f.reduce((s,t)=>t.amount>0?s+t.amount:s,0);
+        const exp = f.reduce((s,t)=>t.amount<0?s+Math.abs(t.amount):s,0);
+        document.getElementById('val-bal').innerText = `$${(inc-exp).toLocaleString()}`;
+        const dol = parseFloat(document.getElementById('manualDolar').value)||1200;
+        document.getElementById('val-usd').innerText = `US$ ${((inc-exp)/dol).toFixed(2)}`;
+
+        // Chart Multicolor
+        drawChart(f, inc, exp);
     }
 
     let myChart = null;
-    function updateChart(filtered) {
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        const incomeTotal = filtered.reduce((s, t) => t.amount > 0 ? s + t.amount : s, 0);
-        const expenses = filtered.filter(t => t.amount < 0);
-        let l = [], v = [], c = [];
-        const groups = {}; expenses.forEach(t => { groups[t.category] = (groups[t.category] || 0) + Math.abs(t.amount); });
-        l = Object.keys(groups); v = Object.values(groups);
-        const remaining = incomeTotal - v.reduce((a, b) => a + b, 0);
-        if(remaining > 0) { l.push("Saldo"); v.push(remaining); }
-        c = l.map(x => x === 'Saldo' ? '#E2E8F0' : '#3B82F6');
+    function drawChart(f, inc, exp) {
+        const ctx = document.getElementById('chart').getContext('2d');
+        const exps = f.filter(t=>t.amount<0);
+        const grp = {}; exps.forEach(t=>{ grp[t.category] = (grp[t.category]||0)+Math.abs(t.amount) });
+        
+        let lbl = Object.keys(grp), val = Object.values(grp);
+        const bal = inc - exp;
+        if(bal > 0) { lbl.push("Saldo"); val.push(bal); }
+
+        // Asignación de colores vivos
+        const bg = lbl.map((l,i) => l==='Saldo' ? '#E2E8F0' : palette[i % palette.length]);
+
         if(myChart) myChart.destroy();
-        myChart = new Chart(ctx, { type: 'doughnut', data: { labels: l, datasets: [{ data: v, backgroundColor: c, borderWidth: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: lbl, datasets: [{ data: val, backgroundColor: bg, borderWidth: 0 }] },
+            options: { 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } 
+                } 
+            }
+        });
     }
 
-    function changeMonth(step) { const i = document.getElementById('currentMonth'), [y, m] = i.value.split('-').map(Number); const d = new Date(y, m - 1 + step, 1); i.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; loadData(); }
-    function toggleStatus(id) { const t = transactions.find(x => x.id === id); t.executed = !t.executed; localStorage.setItem('transactions_v4', JSON.stringify(transactions)); loadData(); }
-    function removeTransaction(id) { if(confirm('¿Borrar?')) { transactions = transactions.filter(t => t.id !== id); localStorage.setItem('transactions_v4', JSON.stringify(transactions)); loadData(); } }
-    function startEdit(id) { const t = transactions.find(x => x.id === id); editingId = id; document.getElementById('date').value = t.date; document.getElementById('amount').value = Math.abs(t.amount); document.getElementById('type').value = t.amount > 0 ? 'income' : 'expense'; updateCategoryLogic(); document.getElementById('category').value = t.category; updateConceptLogic(); document.getElementById('conceptSelect').value = t.text; document.getElementById('btn-submit').innerText = 'Actualizar'; document.getElementById('btn-cancel').style.display = 'block'; }
-    function cancelEdit() { editingId = null; document.getElementById('form').reset(); document.getElementById('btn-submit').innerText = 'Guardar'; document.getElementById('btn-cancel').style.display = 'none'; }
-    function updateDolarImpact() { loadData(); }
-    function toggleViewMode() { isAccountingView = !isAccountingView; document.getElementById('view-list').style.display = isAccountingView ? 'none' : 'block'; document.getElementById('view-accounting').style.display = isAccountingView ? 'flex' : 'none'; document.getElementById('viewToggleBtn').innerText = isAccountingView ? 'Lista' : 'Cuenta T'; loadData(); }
-    function downloadData() { const d = encodeURIComponent(JSON.stringify({ transactions, appData })); const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + d; a.download = "finanzas_backup.json"; a.click(); }
-    function importData(inp) { const f = inp.files[0], r = new FileReader(); r.onload = (e) => { const d = JSON.parse(e.target.result); transactions = d.transactions; appData = d.appData; localStorage.setItem('transactions_v4', JSON.stringify(transactions)); localStorage.setItem('appData_v8', JSON.stringify(appData)); loadData(); }; r.readAsText(f); }
-    function deleteCurrentCategory() { /* Opcional: implementar borrado */ }
-    function deleteCurrentConcept() { /* Opcional: implementar borrado */ }
-    function resetChartLevel() { /* Opcional: volver niveles chart */ }
+    // --- UTILIDADES ---
+    function chMonth(s) { const i=document.getElementById('currentMonth'), [y,m]=i.value.split('-').map(Number); const d=new Date(y,m-1+s,1); i.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; load(); }
+    function tog(id) { const t=transactions.find(x=>x.id===id); t.executed=!t.executed; save(); load(); }
+    function del(id) { if(confirm('¿Borrar?')){ transactions=transactions.filter(x=>x.id!==id); save(); load(); } }
+    function ed(id) { 
+        const t=transactions.find(x=>x.id===id); editingId=id;
+        document.getElementById('date').value=t.date; document.getElementById('amount').value=Math.abs(t.amount);
+        document.getElementById('type').value=t.amount>0?'income':'expense'; upCat();
+        document.getElementById('category').value=t.category; upCon();
+        document.getElementById('conceptSelect').value=t.text;
+        document.getElementById('btn-submit').innerText='Actualizar'; document.getElementById('btn-cancel').style.display='block';
+        window.scrollTo({top:0, behavior:'smooth'});
+    }
+    function cancelEdit(){ editingId=null; document.getElementById('form').reset(); document.getElementById('btn-submit').innerText='Guardar'; document.getElementById('btn-cancel').style.display='none'; }
+    function save(){ localStorage.setItem('transactions_v4',JSON.stringify(transactions)); }
+    function saveDolar(){ load(); }
+    function dl(){ const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({transactions,appData})); a.download="backup.json"; a.click(); }
+    function ul(e){ const r=new FileReader(); r.onload=ev=>{ const d=JSON.parse(ev.target.result); transactions=d.transactions; appData=d.appData; save(); localStorage.setItem('appData_v8',JSON.stringify(appData)); load(); }; r.readAsText(e.files[0]); }
 </script>
 </body>
 </html>
