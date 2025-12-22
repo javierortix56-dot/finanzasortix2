@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanzas J&M v13</title>
+    <title>Finanzas J&M v13.1</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,7 +25,6 @@
         }
         .logo { font-weight: 800; color: var(--primary); font-size: 15px; display: flex; align-items: center; gap: 6px; }
         
-        /* Navegación Mes */
         .month-nav { 
             display: flex; align-items: center; background: #F9FAFB; border: 1px solid var(--border); 
             border-radius: 8px; padding: 2px;
@@ -34,12 +33,18 @@
             border: none; background: transparent; padding: 6px 12px; cursor: pointer; 
             color: var(--text-2); font-size: 14px; display: flex; align-items: center;
         }
-        .nav-btn:active { color: var(--primary); background: #E5E7EB; border-radius: 6px; }
         .month-label { 
             font-weight: 700; font-size: 13px; text-transform: uppercase; padding: 0 8px; 
-            min-width: 80px; text-align: center; position: relative;
+            min-width: 75px; text-align: center; position: relative;
         }
-        #datePicker { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
+        #dateInput { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
+
+        /* --- BOTÓN DE RESPALDO EN HEADER --- */
+        .btn-header-add {
+            background: var(--primary); color: white; border: none; border-radius: 6px;
+            width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; margin-left: 10px;
+        }
 
         /* --- KPIs --- */
         .kpi-row { 
@@ -54,7 +59,7 @@
         .kpi-num { font-size: 16px; font-weight: 700; }
         .inp-mini { border: 1px solid var(--border); width: 60px; border-radius: 4px; padding: 2px; font-weight: 600; }
 
-        /* --- TABS VISTA --- */
+        /* --- TABS --- */
         .view-tabs { display: flex; padding: 0 15px; gap: 10px; margin-bottom: 10px; }
         .tab { 
             flex: 1; padding: 8px; text-align: center; background: #E5E7EB; 
@@ -62,87 +67,85 @@
         }
         .tab.active { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
 
-        /* --- CONTENEDOR PRINCIPAL --- */
+        /* --- VISTAS --- */
         .main-container { padding: 0 15px; }
 
-        /* --- VISTA T (CONTABLE) --- */
+        /* CUENTA T */
         .t-container { display: flex; gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         .t-col { flex: 1; background: var(--surface); display: flex; flex-direction: column; }
         .t-head { padding: 8px; text-align: center; font-weight: 700; color: white; font-size: 12px; }
         .t-head.inc { background: var(--success); }
         .t-head.exp { background: var(--danger); }
-        
         .t-list { padding: 0; margin: 0; list-style: none; }
         .t-row { 
-            padding: 6px 8px; border-bottom: 1px solid #F3F4F6; font-size: 11px; 
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px; border-bottom: 1px solid #F3F4F6; font-size: 11px; cursor: pointer;
         }
-        .t-row:last-child { border-bottom: none; }
-        .t-desc { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
-        .t-amt { font-weight: 600; }
+        .t-row:active { background: #F9FAFB; }
+        .t-desc { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display:block; margin-top:2px; }
+        .t-amt { font-weight: 700; float: right; font-size: 12px; }
         .t-total { padding: 8px; text-align: right; font-weight: 800; font-size: 13px; background: #F9FAFB; border-top: 1px solid var(--border); }
 
-        /* --- VISTA LISTA (1 RENGLÓN) --- */
+        /* LISTA */
         .list-row { 
-            background: var(--surface); padding: 0 10px; height: 44px; margin-bottom: 1px;
+            background: var(--surface); padding: 0 10px; height: 48px; margin-bottom: 1px;
             display: grid; grid-template-columns: 30px 25px 1fr auto 40px; align-items: center; gap: 8px;
             border-bottom: 1px solid #F3F4F6;
         }
-        .list-row:first-child { border-top-left-radius: 8px; border-top-right-radius: 8px; }
-        .list-row:last-child { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-bottom: none; }
-        
         .l-check { font-size: 16px; color: #D1D5DB; display: flex; justify-content: center; }
         .l-check.done { color: var(--success); }
         .l-date { font-weight: 700; color: var(--text-2); font-size: 11px; text-align: center; background: #F3F4F6; padding: 2px 0; border-radius: 4px; }
         .l-desc { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .l-amt { font-weight: 700; font-size: 13px; text-align: right; }
         .inc { color: var(--success); } .exp { color: var(--text-1); }
-        
-        .l-actions { display: flex; justify-content: flex-end; gap: 8px; }
         .act-btn { border: none; background: none; color: #9CA3AF; padding: 4px; font-size: 12px; }
 
-        /* --- BOTÓN FLOTANTE (FAB) --- */
+        /* --- BOTÓN FLOTANTE (CORREGIDO) --- */
         .fab { 
-            position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; 
+            position: fixed; 
+            bottom: 80px; /* SUBIDO PARA EVITAR BARRAS DE NAVEGACIÓN */
+            right: 20px; 
+            width: 56px; height: 56px; 
             background: var(--primary); color: white; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 4px 12px rgba(37,99,235,0.4); font-size: 24px; cursor: pointer; z-index: 100;
-            transition: transform 0.1s;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.4); font-size: 24px; cursor: pointer; z-index: 1000;
         }
         .fab:active { transform: scale(0.95); }
 
-        /* --- FORMULARIO MODAL --- */
+        /* --- MODAL --- */
         #modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; 
+            background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; 
+            backdrop-filter: blur(2px);
         }
         .modal-content { 
-            background: var(--surface); width: 100%; border-top-left-radius: 16px; border-top-right-radius: 16px; 
-            padding: 20px; animation: slideUp 0.2s; 
+            background: var(--surface); width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; 
+            padding: 25px 20px; animation: slideUp 0.2s; 
         }
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .inp-full { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: white; -webkit-appearance: none; }
-        .btn-main { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; }
-        .btn-sec { width: 100%; padding: 12px; background: transparent; color: var(--text-2); border: none; margin-top: 8px; }
+        .inp-full { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: white; -webkit-appearance: none; }
+        .btn-main { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 10px; }
+        .btn-sec { width: 100%; padding: 12px; background: transparent; color: var(--text-2); border: none; margin-top: 5px; }
 
-        /* DATA TOOLS */
-        .tools { margin-top: 30px; text-align: center; padding-bottom: 20px; }
-        .link { color: var(--primary); text-decoration: underline; font-size: 11px; margin: 0 10px; cursor: pointer; }
+        .tools { margin-top: 40px; text-align: center; padding-bottom: 30px; }
+        .link { color: var(--primary); text-decoration: underline; font-size: 12px; margin: 0 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo"><i class="fas fa-wallet"></i> &nbsp;Javier & Mary</div>
-        <div class="month-nav">
-            <button class="nav-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="month-label">
-                <span id="monthTxt">DIC 25</span>
-                <input type="month" id="dateInput" onchange="loadData()">
+        <div class="logo"><i class="fas fa-wallet"></i> &nbsp;J&M</div>
+        <div style="display:flex; align-items:center;">
+            <div class="month-nav">
+                <button class="nav-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="month-label">
+                    <span id="monthTxt">DIC 25</span>
+                    <input type="month" id="dateInput" onchange="loadData()">
+                </div>
+                <button class="nav-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <button class="nav-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            <button class="btn-header-add" onclick="openForm()"><i class="fas fa-plus"></i></button>
         </div>
     </div>
 
@@ -155,7 +158,7 @@
             </div>
         </div>
         <div class="kpi" style="border-left: 3px solid var(--success)">
-            <div class="kpi-head">Balance Mes</div>
+            <div class="kpi-head">Balance</div>
             <div class="kpi-num" id="kpiBal">$0</div>
         </div>
         <div class="kpi" style="border-left: 3px solid #0EA5E9">
@@ -202,7 +205,7 @@
 
     <div id="modal">
         <div class="modal-content">
-            <h3 style="margin:0 0 15px 0; font-size:16px;">Registrar Movimiento</h3>
+            <h3 style="margin:0 0 15px 0; font-size:16px; color:var(--text-1)">Registrar Movimiento</h3>
             <form id="txForm">
                 <div class="form-grid">
                     <input type="date" id="fDate" class="inp-full" required>
@@ -221,22 +224,20 @@
                     <input type="checkbox" id="fExec" checked style="transform:scale(1.2)"> Ya pagado/cobrado
                 </label>
 
-                <button type="submit" id="btnSave" class="btn-main">Guardar Movimiento</button>
+                <button type="submit" id="btnSave" class="btn-main">Guardar</button>
                 <button type="button" onclick="closeForm()" class="btn-sec">Cancelar</button>
             </form>
         </div>
     </div>
 
     <div class="tools">
-        <span class="link" onclick="backup()">Descargar Backup</span>
+        <span class="link" onclick="backup()">Backup</span>
         <span class="link" onclick="document.getElementById('fileIn').click()">Restaurar</span>
         <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
     </div>
 
 <script>
-    /* --- LÓGICA DEL SISTEMA --- */
-    
-    // Configuración Inicial
+    /* LÓGICA */
     const defData = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] } };
     let data = JSON.parse(localStorage.getItem('finData_v13')) || defData;
     let editId = null;
@@ -248,268 +249,127 @@
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
         document.getElementById('dateInput').value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
         document.getElementById('usdRate').value = localStorage.getItem('usdRate') || 1200;
-        
-        switchView(currentView);
-        loadData();
+        switchView(currentView); loadData();
     };
 
     function loadData() {
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
         
-        // Header Mes
         const dateObj = new Date(parseInt(y), parseInt(m)-1, 1);
         const mName = dateObj.toLocaleString('es-ES', {month:'short'}).toUpperCase();
         document.getElementById('monthTxt').innerText = `${mName} ${y.substring(2)}`;
         
-        // Filtrar Datos
         const txs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => b.date.localeCompare(a.date));
         
-        // Renderizar Vistas
-        renderTView(txs);
-        renderListView(txs);
-        renderChart(txs);
-        calcKPIs(txs);
+        renderTView(txs); renderListView(txs); renderChart(txs); calcKPIs(txs);
     }
 
-    /* --- VISTA CUENTA T --- */
+    /* VISTA T */
     function renderTView(txs) {
         const incList = document.getElementById('t-list-inc');
         const expList = document.getElementById('t-list-exp');
         incList.innerHTML = ''; expList.innerHTML = '';
-        
         let tInc = 0, tExp = 0;
 
         txs.forEach(t => {
             const day = t.date.split('-')[2];
             const li = document.createElement('li');
-            li.className = 't-row';
-            li.onclick = () => edit(t.id); // Click para editar desde T
+            li.className = 't-row'; li.onclick = () => edit(t.id);
             li.innerHTML = `
-                <div style="display:flex; flex-direction:column; width:100%">
-                    <div style="display:flex; justify-content:space-between;">
-                        <span style="font-size:9px; color:#9CA3AF; font-weight:700">${day} | ${t.cat.substring(0,8)}</span>
-                        ${!t.exec ? '<i class="fas fa-clock" style="font-size:9px; color:#F59E0B"></i>' : ''}
-                    </div>
-                    <div style="display:flex; justify-content:space-between;">
-                        <span class="t-desc">${t.desc}</span>
-                        <span class="t-amt">$${Math.abs(t.amount).toLocaleString()}</span>
-                    </div>
+                <div>
+                    <span style="font-size:10px; color:#6B7280; font-weight:700">${day}</span>
+                    <span class="t-desc">${t.desc}</span>
+                </div>
+                <div style="text-align:right">
+                    ${!t.exec ? '<i class="fas fa-clock" style="font-size:10px; color:#F59E0B"></i>' : ''}
+                    <span class="t-amt">$${Math.abs(t.amount).toLocaleString()}</span>
                 </div>
             `;
-            
             if(t.type === 'inc') { incList.appendChild(li); tInc += Math.abs(t.amount); }
             else { expList.appendChild(li); tExp += Math.abs(t.amount); }
         });
-
         document.getElementById('total-inc').innerText = `$${tInc.toLocaleString()}`;
         document.getElementById('total-exp').innerText = `$${tExp.toLocaleString()}`;
     }
 
-    /* --- VISTA LISTA 1 RENGLÓN --- */
+    /* VISTA LISTA */
     function renderListView(txs) {
         const div = document.getElementById('list-rows');
-        div.innerHTML = '';
-        
-        if(txs.length === 0) {
-            div.innerHTML = '<div style="padding:20px; text-align:center; color:#ccc">Sin movimientos</div>';
-            return;
-        }
-
+        div.innerHTML = txs.length ? '' : '<div style="padding:20px; text-align:center; color:#ccc">Sin movimientos</div>';
         txs.forEach(t => {
-            const day = t.date.split('-')[2];
-            const isInc = t.type === 'inc';
-            
+            const day = t.date.split('-')[2]; const isInc = t.type === 'inc';
             div.innerHTML += `
                 <div class="list-row">
-                    <div class="l-check ${t.exec?'done':''}" onclick="toggleCheck(${t.id})">
-                        <i class="fas ${t.exec?'fa-check-circle':'fa-circle'}"></i>
-                    </div>
+                    <div class="l-check ${t.exec?'done':''}" onclick="toggleCheck(${t.id})"><i class="fas ${t.exec?'fa-check-circle':'fa-circle'}"></i></div>
                     <div class="l-date">${day}</div>
                     <div class="l-desc">${t.desc}</div>
                     <div class="l-amt ${isInc?'inc':'exp'}">${isInc?'+':''}$${Math.abs(t.amount).toLocaleString()}</div>
-                    <div class="l-actions">
-                        <button class="act-btn" onclick="edit(${t.id})"><i class="fas fa-pen"></i></button>
-                        <button class="act-btn" onclick="del(${t.id})"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
+                    <div class="l-actions"><button class="act-btn" onclick="edit(${t.id})"><i class="fas fa-pen"></i></button><button class="act-btn" onclick="del(${t.id})"><i class="fas fa-trash"></i></button></div>
+                </div>`;
         });
     }
 
-    /* --- GESTIÓN FORMULARIO --- */
-    function openForm() {
-        document.getElementById('modal').style.display = 'flex';
-        renderCats();
-        if(!editId) document.getElementById('fAmount').focus();
-    }
-    
-    function closeForm() {
-        document.getElementById('modal').style.display = 'none';
-        resetForm();
-    }
-
-    function resetForm() {
-        editId = null;
-        document.getElementById('txForm').reset();
-        document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('btnSave').innerText = 'Guardar Movimiento';
-    }
+    /* FORM & ACCIONES */
+    function openForm() { document.getElementById('modal').style.display = 'flex'; renderCats(); if(!editId) document.getElementById('fAmount').focus(); }
+    function closeForm() { document.getElementById('modal').style.display = 'none'; resetForm(); }
+    function resetForm() { editId = null; document.getElementById('txForm').reset(); document.getElementById('fDate').value = new Date().toISOString().split('T')[0]; document.getElementById('btnSave').innerText = 'Guardar'; }
 
     document.getElementById('txForm').onsubmit = (e) => {
         e.preventDefault();
         const tx = {
             id: editId || Date.now(),
             date: document.getElementById('fDate').value,
-            amount: Math.abs(document.getElementById('fAmount').value), // Siempre positivo en BD
+            amount: Math.abs(document.getElementById('fAmount').value),
             type: document.getElementById('fType').value,
             cat: document.getElementById('fCat').value,
             desc: document.getElementById('fDesc').value,
             exec: document.getElementById('fExec').checked
         };
-
-        if(editId) {
-            const idx = data.txs.findIndex(t => t.id == editId);
-            if(idx !== -1) data.txs[idx] = tx;
-        } else {
-            data.txs.push(tx);
-        }
-
+        if(editId) { const idx = data.txs.findIndex(t => t.id == editId); if(idx !== -1) data.txs[idx] = tx; } else { data.txs.push(tx); }
         save(); closeForm(); loadData();
     };
 
-    /* --- ACCIONES --- */
-    function addMonth(n) {
-        const inp = document.getElementById('dateInput');
-        let [y,m] = inp.value.split('-').map(Number);
-        const d = new Date(y, m-1+n, 1);
-        inp.value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
-        loadData();
-    }
-
-    function edit(id) {
-        const t = data.txs.find(x => x.id == id);
-        if(!t) return;
-        editId = id;
-        document.getElementById('fDate').value = t.date;
-        document.getElementById('fAmount').value = t.amount;
-        document.getElementById('fType').value = t.type;
-        renderCats();
-        document.getElementById('fCat').value = t.cat;
-        document.getElementById('fDesc').value = t.desc;
-        document.getElementById('fExec').checked = t.exec;
-        document.getElementById('btnSave').innerText = 'Actualizar';
-        openForm();
-    }
-
-    function del(id) {
-        if(confirm('¿Borrar este movimiento?')) {
-            data.txs = data.txs.filter(t => t.id != id);
-            save(); loadData();
-        }
-    }
-
-    function toggleCheck(id) {
-        const t = data.txs.find(x => x.id == id);
-        if(t) { t.exec = !t.exec; save(); loadData(); }
-    }
-
+    function addMonth(n) { const inp = document.getElementById('dateInput'); let [y,m] = inp.value.split('-').map(Number); const d = new Date(y, m-1+n, 1); inp.value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`; loadData(); }
+    function edit(id) { const t = data.txs.find(x => x.id == id); if(!t) return; editId = id; document.getElementById('fDate').value = t.date; document.getElementById('fAmount').value = t.amount; document.getElementById('fType').value = t.type; renderCats(); document.getElementById('fCat').value = t.cat; document.getElementById('fDesc').value = t.desc; document.getElementById('fExec').checked = t.exec; document.getElementById('btnSave').innerText = 'Actualizar'; openForm(); }
+    function del(id) { if(confirm('¿Eliminar?')) { data.txs = data.txs.filter(t => t.id != id); save(); loadData(); } }
+    function toggleCheck(id) { const t = data.txs.find(x => x.id == id); if(t) { t.exec = !t.exec; save(); loadData(); } }
+    
     function switchView(view) {
-        currentView = view;
-        localStorage.setItem('lastView', view);
-        
-        ['t', 'list', 'chart'].forEach(v => {
-            document.getElementById(`view-${v}`).style.display = (v === view) ? 'block' : 'none';
-            document.getElementById(`tab-${v}`).className = (v === view) ? 'tab active' : 'tab';
-        });
+        currentView = view; localStorage.setItem('lastView', view);
+        ['t', 'list', 'chart'].forEach(v => { document.getElementById(`view-${v}`).style.display = (v === view) ? 'block' : 'none'; document.getElementById(`tab-${v}`).className = (v === view) ? 'tab active' : 'tab'; });
     }
 
-    /* --- HELPERS --- */
     function calcKPIs(txs) {
         const bal = txs.reduce((acc, t) => acc + (t.type=='inc' ? +t.amount : -t.amount), 0);
-        const rate = +document.getElementById('usdRate').value || 1;
-        localStorage.setItem('usdRate', rate);
-        
-        const bEl = document.getElementById('kpiBal');
-        bEl.innerText = `$${bal.toLocaleString()}`;
-        bEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)';
-        document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`;
+        const rate = +document.getElementById('usdRate').value || 1; localStorage.setItem('usdRate', rate);
+        const bEl = document.getElementById('kpiBal'); bEl.innerText = `$${bal.toLocaleString()}`; bEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)'; document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`;
     }
 
     function renderCats() {
-        const type = document.getElementById('fType').value;
-        const sel = document.getElementById('fCat');
-        sel.innerHTML = '';
-        (data.cats[type] || []).forEach(c => sel.add(new Option(c,c)));
-        sel.add(new Option('+ Crear Categoría', 'new'));
+        const sel = document.getElementById('fCat'); sel.innerHTML = '';
+        (data.cats[document.getElementById('fType').value] || []).forEach(c => sel.add(new Option(c,c))); sel.add(new Option('+ Crear', 'new'));
     }
-
-    function checkNewCat() {
-        if(document.getElementById('fCat').value === 'new') {
-            const n = prompt('Nombre nueva categoría:');
-            if(n) {
-                data.cats[document.getElementById('fType').value].push(n);
-                save(); renderCats();
-                document.getElementById('fCat').value = n;
-            } else renderCats();
-        }
-    }
+    function checkNewCat() { if(document.getElementById('fCat').value === 'new') { const n = prompt('Nueva categoría:'); if(n) { data.cats[document.getElementById('fType').value].push(n); save(); renderCats(); document.getElementById('fCat').value = n; } else renderCats(); } }
 
     function renderChart(txs) {
-        const ctx = document.getElementById('myChart');
-        if(chartInstance) chartInstance.destroy();
-        
+        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
         const exps = txs.filter(t => t.type === 'exp');
         const grp = exps.reduce((a,t) => { a[t.cat] = (a[t.cat]||0)+ +t.amount; return a; }, {});
-        
-        chartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(grp),
-                datasets: [{ data: Object.values(grp), backgroundColor: ['#EF4444','#F59E0B','#3B82F6','#10B981','#8B5CF6'], borderWidth:0 }]
-            },
-            options: { plugins: { legend: { position:'right', labels:{boxWidth:12, font:{size:10}} } }, maintainAspectRatio: false }
-        });
+        chartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(grp), datasets: [{ data: Object.values(grp), backgroundColor: ['#EF4444','#F59E0B','#3B82F6','#10B981','#8B5CF6'], borderWidth:0 }] }, options: { plugins: { legend: { position:'right', labels:{boxWidth:12} } }, maintainAspectRatio: false } });
     }
 
-    /* --- BACKUP SYSTEM (COMPATIBLE V10-V12) --- */
     function save() { localStorage.setItem('finData_v13', JSON.stringify(data)); }
-    function backup() { 
-        const a = document.createElement('a'); 
-        a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); 
-        a.download = 'backup_v13.json'; a.click(); 
-    }
-    
+    function backup() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download = 'backup.json'; a.click(); }
     function restoreSmart(input) {
         const fr = new FileReader();
         fr.onload = (e) => {
-            try {
-                const json = JSON.parse(e.target.result);
-                
-                // Si es formato V13
-                if(json.txs && Array.isArray(json.txs) && json.cats) {
-                    data = json;
-                } 
-                // Si es formato antiguo (V10-V11)
-                else if(json.transactions) {
-                    if(confirm("Formato antiguo detectado. ¿Convertir?")) {
-                        const newTxs = json.transactions.map(t => ({
-                            id: t.id || Date.now(),
-                            date: t.date,
-                            amount: Math.abs(t.amount),
-                            type: t.amount < 0 ? 'exp' : 'inc',
-                            cat: t.category,
-                            desc: t.text || 'Sin descripción',
-                            exec: t.executed !== false
-                        }));
-                        data = { txs: newTxs, cats: defData.cats };
-                    } else return;
-                }
-                
+            try { const json = JSON.parse(e.target.result);
+                if(json.txs && Array.isArray(json.txs)) data = json;
+                else if(json.transactions) { if(confirm("¿Convertir datos antiguos?")) { const newTxs = json.transactions.map(t => ({ id: t.id||Date.now(), date: t.date, amount: Math.abs(t.amount), type: t.amount<0?'exp':'inc', cat: t.category, desc: t.text||'Sin desc', exec: t.executed!==false })); data = { txs: newTxs, cats: defData.cats }; } else return; }
                 save(); location.reload();
-            } catch(err) { alert("Error al leer archivo"); }
-        };
-        fr.readAsText(input.files[0]);
+            } catch(err) { alert("Error"); }
+        }; fr.readAsText(input.files[0]);
     }
 </script>
 </body>
