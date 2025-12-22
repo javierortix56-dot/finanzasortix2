@@ -3,708 +3,365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanzas Javier y Mary (Mobile Optimized)</title>
+    <title>Finanzas J&M Compact</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* --- 1. DISEÑO BASE (TOKENS) --- */
         :root {
-            --bg-app: #F0F2F5; 
-            --surface: #FFFFFF;
-            --primary: #2563EB; 
-            --text-main: #1E293B; 
-            --text-sec: #64748B;
-            --success: #16A34A; 
-            --danger: #DC2626; 
-            --warning: #F59E0B;
-            --border: #E2E8F0;
-            --radius: 12px;
+            --bg: #F8F9FA; --surface: #FFFFFF; --primary: #2563EB; 
+            --text-1: #111827; --text-2: #6B7280; --border: #E5E7EB;
+            --success: #059669; --danger: #DC2626;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-main); margin: 0; padding: 0; font-size: 14px; padding-bottom: 80px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0 0 80px 0; color: var(--text-1); font-size: 14px; }
 
-        /* --- 2. LAYOUT GENERAL --- */
-        .app-container { max-width: 1200px; margin: 0 auto; padding: 15px; }
+        /* HEADER COMPACTO */
+        .top-bar { 
+            background: var(--surface); padding: 10px 15px; position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .logo { font-weight: 700; color: var(--primary); font-size: 15px; display: flex; align-items: center; gap: 6px; }
         
-        /* Grid responsivo: Escritorio (2 col) vs Movil (1 col) */
-        .layout-grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
-        
-        @media (max-width: 900px) {
-            .layout-grid { grid-template-columns: 1fr; display: flex; flex-direction: column-reverse; }
-            /* En móvil, ponemos el form arriba visualmente usando Order si quisieramos, pero usaremos un botón flotante/acordeón */
-            .layout-grid { flex-direction: column; } 
+        /* SELECTOR MES SIMPLE */
+        .month-selector { display: flex; align-items: center; background: #F3F4F6; border-radius: 6px; padding: 2px; }
+        .month-btn { border: none; background: none; padding: 4px 8px; color: var(--text-2); cursor: pointer; }
+        .month-label { font-weight: 600; font-size: 13px; padding: 0 8px; position: relative; }
+        #dateInput { position: absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+
+        /* KPIS - AHORA CABEN 2.5 EN PANTALLA */
+        .kpi-scroller { 
+            display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; 
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+        }
+        .kpi-card { 
+            min-width: 130px; flex: 1; background: var(--surface); padding: 10px; 
+            border-radius: 10px; border: 1px solid var(--border); scroll-snap-align: start;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .kpi-title { font-size: 10px; color: var(--text-2); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .kpi-val { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+        .dolar-edit { width: 60px; border: 1px solid var(--border); border-radius: 4px; padding: 2px 4px; font-weight: 600; font-size: 14px; }
+
+        /* BOTÓN FLOTANTE O BARRA SUPERIOR PARA AGREGAR */
+        .add-bar { padding: 0 15px; margin-top: 5px; }
+        .btn-add { 
+            width: 100%; background: var(--primary); color: white; border: none; 
+            padding: 10px; border-radius: 8px; font-weight: 600; font-size: 14px;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
 
-        .card { background: var(--surface); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px; border: 1px solid var(--border); }
+        /* FORMULARIO OCULTO */
+        #formPanel { display: none; background: var(--surface); padding: 15px; border-bottom: 1px solid var(--border); animation: slideDown 0.2s; }
+        @keyframes slideDown { from{transform:translateY(-10px);opacity:0} to{transform:translateY(0);opacity:1}}
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .inp { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: white; }
+        .btn-save { background: var(--text-1); color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; }
+        .btn-cancel { background: transparent; color: var(--text-2); width: 100%; padding: 10px; border: none; margin-top: 5px; }
 
-        /* --- 3. TOP BAR & NAV --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--surface); padding: 12px 15px; border-radius: var(--radius); border: 1px solid var(--border); position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .app-logo { font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 1.1em; }
+        /* LISTA ULTRA COMPACTA */
+        .list-container { background: var(--surface); margin-top: 10px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .list-header { padding: 10px 15px; font-size: 12px; font-weight: 700; color: var(--text-2); background: #FAFAFA; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
-        .month-selector { display: flex; align-items: center; background: #F1F5F9; border-radius: 8px; padding: 4px; }
-        .month-selector button { border: none; background: none; padding: 6px 12px; cursor: pointer; color: var(--text-sec); font-size: 16px; }
-        .month-display { font-weight: 700; font-size: 13px; text-transform: uppercase; margin: 0 8px; position: relative; width: 80px; text-align: center; }
-        #currentMonthInput { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-
-        /* --- 4. KPIs (SCROLL HORIZONTAL EN MOVIL) --- */
-        .kpi-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        
-        @media (max-width: 600px) {
-            .kpi-container { 
-                display: flex; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; 
-                -webkit-overflow-scrolling: touch; gap: 12px;
-            }
-            .kpi-card { min-width: 85%; scroll-snap-align: center; }
+        .txn-item { 
+            display: flex; align-items: center; padding: 12px 15px; 
+            border-bottom: 1px solid var(--border); background: var(--surface);
         }
-
-        .kpi-card { background: var(--surface); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); border-left: 5px solid transparent; }
-        .kpi-card.blue { border-left-color: var(--primary); }
-        .kpi-card.green { border-left-color: var(--success); }
-        .kpi-card.info { border-left-color: #0EA5E9; }
-        
-        .kpi-label { font-size: 11px; text-transform: uppercase; color: var(--text-sec); font-weight: 700; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
-        .kpi-value { font-size: 22px; font-weight: 700; color: var(--text-main); }
-        .dolar-input { width: 80px; padding: 4px; border: 1px solid var(--border); border-radius: 6px; font-weight: 600; font-size: 16px; background: #F8FAFC; }
-
-        /* --- 5. FORMULARIO (ACORDEON) --- */
-        .form-toggle-btn { width: 100%; background: var(--primary); color: white; padding: 12px; border-radius: var(--radius); border: none; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .form-content { display: none; padding-top: 10px; animation: slideDown 0.3s ease; }
-        .form-content.active { display: block; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .form-full { grid-column: span 2; }
-        
-        label { display: block; font-size: 11px; font-weight: 600; color: var(--text-sec); margin-bottom: 4px; text-transform: uppercase; }
-        input, select { width: 100%; height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: white; -webkit-appearance: none; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        
-        .btn-action { width: 100%; height: 44px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; border: none; }
-        .btn-primary { background: var(--text-main); color: white; }
-        .btn-cancel { background: white; border: 1px solid var(--border); color: var(--text-sec); margin-top: 10px; }
-        .btn-primary.editing { background: var(--warning); color: white; }
-
-        /* --- 6. LISTA DE MOVIMIENTOS (TRANSFORMACION A CARDS) --- */
-        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        
-        /* ESTILOS ESCRITORIO */
-        @media (min-width: 769px) {
-            th { text-align: left; padding: 10px; color: var(--text-sec); font-size: 12px; border-bottom: 1px solid var(--border); }
-            td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-            .mobile-label { display: none; }
+        .txn-icon { 
+            width: 32px; height: 32px; border-radius: 50%; background: #F3F4F6; 
+            display: flex; align-items: center; justify-content: center; margin-right: 12px;
+            color: var(--text-2); font-size: 14px; flex-shrink: 0;
         }
-
-        /* ESTILOS MÓVIL (MAGIA AQUÍ) */
-        @media (max-width: 768px) {
-            thead { display: none; } /* Ocultar cabeceras */
-            tr { 
-                display: grid; 
-                grid-template-columns: 40px 1fr auto; 
-                grid-template-areas: 
-                    "icon cat amount"
-                    "icon text actions";
-                background: white;
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                padding: 12px;
-                margin-bottom: 10px;
-                align-items: center;
-                gap: 2px 10px;
-            }
-            td { border: none; padding: 0; }
-            
-            /* Asignar celdas a áreas del grid */
-            td:nth-child(1) { grid-area: icon; display: flex; justify-content: center; } /* Status Check */
-            td:nth-child(2) { display: none; } /* Fecha (se puede poner pequeña si quieres, o quitar) */
-            td:nth-child(3) { grid-area: cat; font-size: 11px; } /* Categoría */
-            td:nth-child(4) { grid-area: text; font-weight: 600; color: var(--text-main); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* Concepto */
-            td:nth-child(5) { grid-area: amount; text-align: right; font-size: 15px; font-weight: 700; } /* Monto */
-            td:nth-child(6) { grid-area: actions; text-align: right; } /* Botones */
-        }
-
-        .tag { padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; display: inline-block; }
-        .tag.essential { background: #FEF3C7; color: #D97706; }
-        .tag.debt { background: #E0F2FE; color: #0284C7; }
-        .tag.savings { background: #DCFCE7; color: #16A34A; }
-        .tag.personal { background: #F3F4F6; color: #64748B; }
-
-        .amount-pos { color: var(--success); }
-        .amount-neg { color: var(--text-main); }
+        .txn-icon.checked { background: #DCFCE7; color: var(--success); }
         
-        .action-icon { width: 32px; height: 32px; border-radius: 8px; border: none; background: #F1F5F9; color: var(--text-sec); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; margin-left: 4px; }
-        .action-icon.edit:hover { color: var(--warning); background: #FFFBEB; }
-        .action-icon.del:hover { color: var(--danger); background: #FEF2F2; }
-
-        /* --- 7. UTILS --- */
-        .fab-add { display: none; } /* Opcional si quisieras boton flotante */
-        .check-btn { font-size: 18px; cursor: pointer; color: #CBD5E1; transition: color 0.2s; }
-        .check-btn.checked { color: var(--success); }
+        .txn-info { flex: 1; min-width: 0; }
+        .txn-cat { font-size: 10px; color: var(--text-2); font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 2px;}
+        .txn-title { font-size: 14px; font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
         
-        .delete-mini { background: #fee2e2; color: #ef4444; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; }
+        .txn-right { text-align: right; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-end; }
+        .txn-amount { font-size: 15px; font-weight: 700; display: block; }
+        .neg { color: var(--text-1); } .pos { color: var(--success); }
+        
+        .txn-actions { margin-top: 4px; display: flex; gap: 12px; }
+        .act-btn { color: #9CA3AF; font-size: 12px; background: none; border: none; padding: 2px; }
+        .act-btn:hover { color: var(--primary); }
 
-        /* Contabilidad T */
-        .t-view { display: flex; gap: 10px; margin-top: 10px; }
-        .t-col { flex: 1; background: #F8FAFC; border-radius: 8px; padding: 10px; }
-        .t-header { font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 12px; padding-bottom: 5px; border-bottom: 2px solid #ddd; }
-        .t-header.inc { color: var(--success); border-color: var(--success); }
-        .t-header.exp { color: var(--danger); border-color: var(--danger); }
-        .t-item { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid #eee; }
-
+        /* GRAFICO */
+        .chart-box { background: var(--surface); margin: 15px; padding: 15px; border-radius: 10px; border: 1px solid var(--border); height: 220px; }
+        
+        /* DATA TOOLS */
+        .tools { padding: 20px; text-align: center; }
+        .link { color: var(--primary); text-decoration: none; font-size: 12px; margin: 0 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="top-bar">
+    <div class="logo"><i class="fas fa-wallet"></i> Javier & Mary</div>
+    <div class="month-selector">
+        <button class="month-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+        <span class="month-label" id="monthTxt">DIC 25 <input type="month" id="dateInput" onchange="loadData()"></span>
+        <button class="month-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+
+<div class="kpi-scroller">
+    <div class="kpi-card" style="border-left: 3px solid var(--primary);">
+        <span class="kpi-title">Dólar Ref.</span>
+        <div style="display:flex; align-items:center; gap:4px;">
+            <span style="color:#9CA3AF">$</span>
+            <input type="number" id="usdRate" class="dolar-edit" value="1200" onchange="calcKPIs()">
+        </div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid var(--success);">
+        <span class="kpi-title">Balance</span>
+        <div class="kpi-val" id="kpiBal">$0</div>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #0EA5E9;">
+        <span class="kpi-title">Ahorro USD</span>
+        <div class="kpi-val" id="kpiUsd" style="color:#0EA5E9">$0</div>
+    </div>
+</div>
+
+<div class="add-bar">
+    <button class="btn-add" onclick="toggleForm()">
+        <i class="fas fa-plus"></i> Registrar Movimiento
+    </button>
+</div>
+
+<div id="formPanel">
+    <form id="txForm">
+        <div class="form-row">
+            <input type="date" id="fDate" class="inp" required>
+            <input type="number" id="fAmount" class="inp" placeholder="$ Monto" required>
+        </div>
+        <div class="form-row">
+            <select id="fType" class="inp" onchange="renderCats()" style="flex:1">
+                <option value="exp">🔴 Gasto</option>
+                <option value="inc">🟢 Ingreso</option>
+            </select>
+            <select id="fCat" class="inp" style="flex:2" onchange="checkNewCat()"></select>
+        </div>
+        <div class="form-row"><input type="text" id="fDesc" class="inp" placeholder="Descripción (ej. Supermercado)" required></div>
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
+            <input type="checkbox" id="fExec" checked> Ya pagado/cobrado
+        </label>
+        <button type="submit" id="btnSave" class="btn-save">Guardar</button>
+        <button type="button" onclick="toggleForm()" class="btn-cancel">Cancelar</button>
+    </form>
+</div>
+
+<div class="list-container">
+    <div class="list-header">
+        <span>MOVIMIENTOS</span>
+        <span onclick="toggleView()" id="viewToggle" style="cursor:pointer; color:var(--primary)">Ver Gráfico</span>
+    </div>
     
-    <div class="header">
-        <div class="app-logo">
-            <i class="fas fa-wallet"></i> Javier & Mary
-        </div>
-        <div class="month-selector">
-            <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="month-display">
-                <span id="monthLabel">DIC</span>
-                <input type="month" id="currentMonthInput" onchange="loadData()">
-            </div>
-            <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
-        </div>
+    <div id="txList"></div> <div id="chartView" class="chart-box" style="display:none; margin:0; border:none;">
+        <canvas id="myChart"></canvas>
     </div>
+</div>
 
-    <div class="kpi-container">
-        <div class="kpi-card blue">
-            <span class="kpi-label">Dólar Ref.</span>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <span style="color:var(--text-sec);">$</span>
-                <input type="number" id="manualDolar" class="dolar-input" value="1200" onchange="updateKPIs()">
-            </div>
-        </div>
-        <div class="kpi-card green">
-            <span class="kpi-label">Balance Mes</span>
-            <div class="kpi-value" id="month-balance">$0</div>
-        </div>
-        <div class="kpi-card info">
-            <span class="kpi-label">Ahorro USD</span>
-            <div class="kpi-value" id="usd-savings" style="color:#0284C7">$0</div>
-        </div>
-    </div>
-
-    <div class="layout-grid">
-        
-        <div class="main-content">
-            
-            <button class="form-toggle-btn" onclick="toggleForm()">
-                <span><i class="fas fa-plus-circle"></i> Nuevo Movimiento</span>
-                <i class="fas fa-chevron-down" id="formChevron"></i>
-            </button>
-
-            <div class="card" id="formCard" style="display:none;">
-                <form id="transactionForm">
-                    <div class="form-row">
-                        <div>
-                            <label>Fecha</label>
-                            <input type="date" id="date" required>
-                        </div>
-                        <div>
-                            <label>Monto</label>
-                            <input type="number" id="amount" placeholder="0.00" step="0.01" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div>
-                            <label>Tipo</label>
-                            <select id="type" onchange="updateCategoryDropdown()">
-                                <option value="expense">🔴 Egreso</option>
-                                <option value="income">🟢 Ingreso</option>
-                            </select>
-                        </div>
-                        <div style="display:flex; align-items:flex-end; gap:5px;">
-                             <div style="flex:1">
-                                <label>Categoría</label>
-                                <select id="category" onchange="handleCategoryChange()" required></select>
-                             </div>
-                             <button type="button" class="delete-mini" onclick="deleteCategory()"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div id="customCatDiv" style="display:none; margin-bottom:12px;">
-                        <input type="text" id="newCatInput" placeholder="Nombre nueva categoría...">
-                    </div>
-
-                    <div class="form-row form-full">
-                        <div style="width:100%">
-                            <label>Concepto</label>
-                            <div style="display:flex; gap:5px;">
-                                <select id="concept" onchange="handleConceptChange()" style="flex:1"></select>
-                                <button type="button" class="delete-mini" onclick="deleteConcept()"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="customConceptDiv" style="display:none; margin-bottom:12px;">
-                        <input type="text" id="newConceptInput" placeholder="Nombre nuevo concepto...">
-                    </div>
-
-                    <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
-                        <input type="checkbox" id="executed" checked style="width:20px; height:20px;">
-                        <label style="margin:0; cursor:pointer;" for="executed">Ya se pagó/cobró</label>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn-action btn-primary">Guardar</button>
-                    <button type="button" id="cancelBtn" class="btn-action btn-cancel" style="display:none;" onclick="resetForm()">Cancelar Edición</button>
-                </form>
-            </div>
-
-            <div class="card" style="min-height:400px;">
-                <div class="list-header">
-                    <h3 style="margin:0; font-size:16px;">Movimientos</h3>
-                    <button onclick="toggleView()" style="background:none; border:1px solid var(--border); padding:5px 10px; border-radius:6px;">
-                        <i class="fas fa-exchange-alt"></i> <span id="viewName">Vista Lista</span>
-                    </button>
-                </div>
-
-                <div id="listView">
-                    <table id="transTable">
-                        <thead>
-                            <tr>
-                                <th width="30"></th>
-                                <th width="90">Fecha</th>
-                                <th width="120">Categoría</th>
-                                <th>Concepto</th>
-                                <th style="text-align:right">Monto</th>
-                                <th style="text-align:right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="listBody"></tbody>
-                    </table>
-                </div>
-
-                <div id="accountingView" style="display:none;">
-                    <div class="t-view">
-                        <div class="t-col">
-                            <div class="t-header inc">INGRESOS</div>
-                            <div id="t-inc-list"></div>
-                            <div id="t-inc-total" style="text-align:right; font-weight:bold; margin-top:5px; color:var(--success)"></div>
-                        </div>
-                        <div class="t-col">
-                            <div class="t-header exp">EGRESOS</div>
-                            <div id="t-exp-list"></div>
-                            <div id="t-exp-total" style="text-align:right; font-weight:bold; margin-top:5px; color:var(--danger)"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 style="margin:0 0 15px 0; font-size:14px; color:var(--text-sec);">Distribución</h3>
-                <div style="height:250px; position:relative;">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-                <button id="resetChartBtn" onclick="renderChart('category')" style="margin-top:10px; display:none; width:100%; padding:8px;" class="btn-cancel">⬅ Volver a Categorías</button>
-            </div>
-
-            <div class="card" style="background:#F8FAFC; border:none;">
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-action btn-cancel" onclick="downloadData()"><i class="fas fa-download"></i> Backup</button>
-                    <input type="file" id="importFile" hidden onchange="importData(this)">
-                    <button class="btn-action btn-cancel" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload"></i> Restore</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
+<div class="tools">
+    <span class="link" onclick="backup()">Descargar Backup</span>
+    <span class="link" onclick="document.getElementById('fileIn').click()">Restaurar</span>
+    <input type="file" id="fileIn" hidden onchange="restore(this)">
 </div>
 
 <script>
-    /* --- LÓGICA DE NEGOCIO (Igual que antes, optimizada) --- */
-    
-    // 1. DATA INICIAL
-    const defaultData = {
-        categories: {
-            income: ["Ingresos Gral", "Ventas"],
-            expense: ["Esenciales", "Deudas", "Personal", "Ahorro", "Hijos"]
-        },
-        concepts: {
-            "Ingresos Gral": ["Sueldo Javier", "Sueldo Mary", "Aguinaldo"],
-            "Esenciales": ["Alquiler", "Luz", "Gas", "Internet", "Supermercado", "Nafta"],
-            "Deudas": ["Visa", "Mastercard", "Prestamo"],
-            "Personal": ["Salidas", "Ropa", "Gym"],
-            "Ahorro": ["Compra USD", "Inversiones"],
-            "Hijos": ["Colegio", "Comedor", "Regalos"]
-        }
-    };
+    // --- DATOS Y CONFIG ---
+    let data = JSON.parse(localStorage.getItem('finData_v12')) || { txs: [], cats: { exp:['Esenciales','Deudas','Ocio','Ahorro'], inc:['Sueldo','Ventas'] } };
+    let editId = null;
 
-    let appData = JSON.parse(localStorage.getItem('appData_v11')) || defaultData;
-    let transactions = JSON.parse(localStorage.getItem('transactions_v11')) || [];
-    let editingId = null;
-    let currentView = 'list'; // 'list' or 'accounting'
-
-    // 2. INICIO
     window.onload = () => {
-        const today = new Date();
-        document.getElementById('currentMonthInput').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
-        document.getElementById('date').value = today.toISOString().split('T')[0];
-        
-        // Cargar dólar guardado
-        const savedDolar = localStorage.getItem('dolarRate');
-        if(savedDolar) document.getElementById('manualDolar').value = savedDolar;
-
-        updateCategoryDropdown();
+        document.getElementById('fDate').valueAsDate = new Date();
+        const y = new Date().getFullYear(), m = new Date().getMonth()+1;
+        document.getElementById('dateInput').value = `${y}-${m.toString().padStart(2,'0')}`;
+        document.getElementById('usdRate').value = localStorage.getItem('usdRate') || 1200;
         loadData();
     };
 
-    // 3. NAVEGACION MES
-    function changeMonth(step) {
-        const input = document.getElementById('currentMonthInput');
-        let [y, m] = input.value.split('-').map(Number);
-        const newDate = new Date(y, m - 1 + step, 1);
-        input.value = `${newDate.getFullYear()}-${String(newDate.getMonth()+1).padStart(2,'0')}`;
-        loadData();
-    }
-
+    // --- CORE FUNCIONES ---
     function loadData() {
-        const monthKey = document.getElementById('currentMonthInput').value;
-        const [y, m] = monthKey.split('-');
+        const ym = document.getElementById('dateInput').value;
+        const [y, m] = ym.split('-');
+        document.getElementById('monthTxt').innerHTML = `${new Date(y,m-1).toLocaleString('es',{month:'short'}).toUpperCase()} ${y.substring(2)} <input type="month" id="dateInput" value="${ym}" onchange="loadData()" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0">`;
         
-        // Label visual
-        const dateObj = new Date(parseInt(y), parseInt(m)-1, 1);
-        const monthName = dateObj.toLocaleString('es-ES', { month: 'short' }).toUpperCase();
-        document.getElementById('monthLabel').innerText = `${monthName} ${y.slice(2)}`;
-
-        // Filtrar transacciones
-        const monthTrans = transactions.filter(t => t.date.startsWith(monthKey));
-        monthTrans.sort((a,b) => new Date(b.date) - new Date(a.date)); // Orden descendente
-
-        renderList(monthTrans);
-        renderAccounting(monthTrans);
-        updateKPIs(monthTrans);
-        renderChart('category', monthTrans);
+        const txs = data.txs.filter(t => t.date.startsWith(ym)).sort((a,b) => b.date.localeCompare(a.date));
+        
+        renderList(txs);
+        calcKPIs(txs);
+        renderChart(txs);
+        renderCats();
     }
 
-    // 4. RENDERIZADO
-    function renderList(data) {
-        const tbody = document.getElementById('listBody');
-        tbody.innerHTML = '';
+    function renderList(txs) {
+        const el = document.getElementById('txList');
+        el.innerHTML = txs.length ? '' : '<div style="padding:20px;text-align:center;color:#9CA3AF">Sin movimientos</div>';
         
-        data.forEach(t => {
-            const row = document.createElement('tr');
-            const isInc = t.amount >= 0;
-            const colorClass = isInc ? 'amount-pos' : 'amount-neg';
-            
-            // Asignar clase de tag según categoría aproximada
-            let tagClass = 'personal';
-            if(t.category === 'Esenciales') tagClass = 'essential';
-            if(t.category === 'Deudas') tagClass = 'debt';
-            if(t.category === 'Ahorro') tagClass = 'savings';
-
-            row.innerHTML = `
-                <td>
-                    <i class="fas fa-check-circle check-btn ${t.executed ? 'checked' : ''}" onclick="toggleExec(${t.id})"></i>
-                </td>
-                <td>${t.date.split('-')[2]}/${t.date.split('-')[1]}</td>
-                <td><span class="tag ${tagClass}">${t.category}</span></td>
-                <td>${t.text}</td>
-                <td class="${colorClass}">$${Math.abs(t.amount).toLocaleString()}</td>
-                <td>
-                    <button class="action-icon edit" onclick="editItem(${t.id})"><i class="fas fa-pen"></i></button>
-                    <button class="action-icon del" onclick="deleteItem(${t.id})"><i class="fas fa-trash"></i></button>
-                </td>
-            `;
-            tbody.appendChild(row);
+        txs.forEach(t => {
+            const isInc = t.type === 'inc';
+            el.innerHTML += `
+            <div class="txn-item">
+                <div class="txn-icon ${t.exec?'checked':''}" onclick="toggleCheck(${t.id})">
+                    <i class="fas ${t.exec?'fa-check':'fa-clock'}"></i>
+                </div>
+                <div class="txn-info">
+                    <span class="txn-cat">${t.cat}</span>
+                    <span class="txn-title">${t.desc}</span>
+                </div>
+                <div class="txn-right">
+                    <span class="txn-amount ${isInc?'pos':'neg'}">${isInc?'+':''}$${parseInt(t.amount).toLocaleString()}</span>
+                    <div class="txn-actions">
+                        <button class="act-btn" onclick="edit(${t.id})"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="act-btn" onclick="del(${t.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>`;
         });
     }
 
-    function renderAccounting(data) {
-        const incList = document.getElementById('t-inc-list');
-        const expList = document.getElementById('t-exp-list');
-        incList.innerHTML = ''; expList.innerHTML = '';
-        let totInc = 0, totExp = 0;
-
-        data.forEach(t => {
-            const div = document.createElement('div');
-            div.className = 't-item';
-            div.innerHTML = `<span>${t.text}</span> <span>$${Math.abs(t.amount).toLocaleString()}</span>`;
-            
-            if(t.amount >= 0) { incList.appendChild(div); totInc += t.amount; }
-            else { expList.appendChild(div); totExp += Math.abs(t.amount); }
-        });
-
-        document.getElementById('t-inc-total').innerText = `$${totInc.toLocaleString()}`;
-        document.getElementById('t-exp-total').innerText = `$${totExp.toLocaleString()}`;
+    function calcKPIs(txs) {
+        if(!txs) txs = data.txs.filter(t => t.date.startsWith(document.getElementById('dateInput').value));
+        const bal = txs.reduce((acc, t) => acc + (t.type=='inc' ? +t.amount : -t.amount), 0);
+        const rate = +document.getElementById('usdRate').value;
+        localStorage.setItem('usdRate', rate);
+        
+        const balEl = document.getElementById('kpiBal');
+        balEl.innerText = `$${bal.toLocaleString()}`;
+        balEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)';
+        document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`;
     }
 
-    function updateKPIs(data) {
-        if(!data) { // Si llamamos desde el input de dólar sin data
-            loadData(); return; 
-        }
-        const total = data.reduce((acc, t) => acc + t.amount, 0);
-        const dolar = parseFloat(document.getElementById('manualDolar').value) || 1200;
-        
-        localStorage.setItem('dolarRate', dolar);
-
-        document.getElementById('month-balance').innerText = `$${total.toLocaleString()}`;
-        document.getElementById('month-balance').style.color = total >= 0 ? 'var(--text-main)' : 'var(--danger)';
-        
-        const usd = total / dolar;
-        document.getElementById('usd-savings').innerText = `US$ ${usd.toFixed(2)}`;
-    }
-
-    // 5. FORMULARIO & LOGICA
+    // --- FORMULARIO ---
     function toggleForm() {
-        const form = document.getElementById('formCard');
-        const icon = document.getElementById('formChevron');
-        if(form.style.display === 'none') {
-            form.style.display = 'block';
-            icon.classList.remove('fa-chevron-down'); icon.classList.add('fa-chevron-up');
-        } else {
-            form.style.display = 'none';
-            icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down');
+        const p = document.getElementById('formPanel');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        if(p.style.display === 'block') document.getElementById('fAmount').focus();
+        else resetForm();
+    }
+
+    function renderCats() {
+        const type = document.getElementById('fType').value;
+        const sel = document.getElementById('fCat');
+        sel.innerHTML = '';
+        data.cats[type].forEach(c => sel.add(new Option(c,c)));
+        sel.add(new Option('+ Crear Categoría', 'new'));
+    }
+    
+    function checkNewCat() {
+        if(document.getElementById('fCat').value === 'new') {
+            const n = prompt('Nombre nueva categoría:');
+            if(n) {
+                const type = document.getElementById('fType').value;
+                data.cats[type].push(n);
+                save(); renderCats();
+                document.getElementById('fCat').value = n;
+            } else renderCats();
         }
     }
 
-    function updateCategoryDropdown() {
-        const type = document.getElementById('type').value;
-        const select = document.getElementById('category');
-        select.innerHTML = '';
-        
-        const cats = type === 'income' ? appData.categories.income : appData.categories.expense;
-        cats.forEach(c => select.add(new Option(c, c)));
-        select.add(new Option('+ Nueva Categoría', 'new'));
-        handleCategoryChange();
-    }
-
-    function handleCategoryChange() {
-        const cat = document.getElementById('category').value;
-        const div = document.getElementById('customCatDiv');
-        
-        if(cat === 'new') {
-            div.style.display = 'block';
-            document.getElementById('concept').innerHTML = '<option value="new">+ Nuevo Concepto</option>';
-        } else {
-            div.style.display = 'none';
-            const conceptSelect = document.getElementById('concept');
-            conceptSelect.innerHTML = '';
-            const concepts = appData.concepts[cat] || [];
-            concepts.forEach(c => conceptSelect.add(new Option(c, c)));
-            conceptSelect.add(new Option('+ Nuevo Concepto', 'new'));
-        }
-        handleConceptChange();
-    }
-
-    function handleConceptChange() {
-        const val = document.getElementById('concept').value;
-        document.getElementById('customConceptDiv').style.display = val === 'new' ? 'block' : 'none';
-    }
-
-    // CRUD
-    document.getElementById('transactionForm').addEventListener('submit', (e) => {
+    document.getElementById('txForm').onsubmit = (e) => {
         e.preventDefault();
-        
-        const amountVal = parseFloat(document.getElementById('amount').value);
-        const type = document.getElementById('type').value;
-        const realAmount = type === 'expense' ? -Math.abs(amountVal) : Math.abs(amountVal);
-        
-        // Manejo de Categorias nuevas
-        let cat = document.getElementById('category').value;
-        if(cat === 'new') {
-            cat = document.getElementById('newCatInput').value.trim();
-            if(!cat) return alert('Nombre de categoría requerido');
-            if(type === 'income') appData.categories.income.push(cat);
-            else appData.categories.expense.push(cat);
-            appData.concepts[cat] = [];
-        }
-
-        // Manejo de Conceptos nuevos
-        let concept = document.getElementById('concept').value;
-        if(concept === 'new') {
-            concept = document.getElementById('newConceptInput').value.trim();
-            if(!concept) return alert('Nombre de concepto requerido');
-            if(!appData.concepts[cat]) appData.concepts[cat] = [];
-            appData.concepts[cat].push(concept);
-        }
-
-        // Guardar estructura actualizada
-        localStorage.setItem('appData_v11', JSON.stringify(appData));
-
-        const newTrans = {
-            id: editingId || Date.now(),
-            date: document.getElementById('date').value,
-            category: cat,
-            text: concept,
-            amount: realAmount,
-            executed: document.getElementById('executed').checked
+        const tx = {
+            id: editId || Date.now(),
+            date: document.getElementById('fDate').value,
+            amount: document.getElementById('fAmount').value,
+            type: document.getElementById('fType').value,
+            cat: document.getElementById('fCat').value,
+            desc: document.getElementById('fDesc').value,
+            exec: document.getElementById('fExec').checked
         };
 
-        if(editingId) {
-            const idx = transactions.findIndex(t => t.id === editingId);
-            transactions[idx] = newTrans;
+        if(editId) {
+            const idx = data.txs.findIndex(t => t.id == editId);
+            data.txs[idx] = tx;
         } else {
-            transactions.push(newTrans);
+            data.txs.push(tx);
         }
-
-        localStorage.setItem('transactions_v11', JSON.stringify(transactions));
         
-        resetForm();
+        save();
+        toggleForm();
         loadData();
-        
-        // Cerrar formulario en móvil tras guardar para limpiar vista
-        if(window.innerWidth < 768) toggleForm(); 
-    });
+    };
 
-    function editItem(id) {
-        const t = transactions.find(x => x.id === id);
-        if(!t) return;
-        editingId = id;
-        
-        // Abrir form si está cerrado
-        const form = document.getElementById('formCard');
-        if(form.style.display === 'none') toggleForm();
-
-        document.getElementById('date').value = t.date;
-        document.getElementById('amount').value = Math.abs(t.amount);
-        document.getElementById('type').value = t.amount >= 0 ? 'income' : 'expense';
-        document.getElementById('executed').checked = t.executed;
-        
-        updateCategoryDropdown();
-        document.getElementById('category').value = t.category;
-        handleCategoryChange();
-        document.getElementById('concept').value = t.text;
-        
-        document.getElementById('submitBtn').innerText = 'Actualizar';
-        document.getElementById('submitBtn').classList.add('editing');
-        document.getElementById('cancelBtn').style.display = 'block';
-        
-        form.scrollIntoView({behavior: 'smooth'});
+    // --- ACCIONES ---
+    function edit(id) {
+        const t = data.txs.find(x => x.id == id);
+        editId = id;
+        document.getElementById('fDate').value = t.date;
+        document.getElementById('fAmount').value = t.amount;
+        document.getElementById('fType').value = t.type;
+        renderCats();
+        document.getElementById('fCat').value = t.cat;
+        document.getElementById('fDesc').value = t.desc;
+        document.getElementById('fExec').checked = t.exec;
+        document.getElementById('btnSave').innerText = 'Actualizar';
+        toggleForm();
     }
 
-    function deleteItem(id) {
-        if(confirm('¿Borrar registro?')) {
-            transactions = transactions.filter(t => t.id !== id);
-            localStorage.setItem('transactions_v11', JSON.stringify(transactions));
-            loadData();
+    function del(id) {
+        if(confirm('¿Borrar?')) {
+            data.txs = data.txs.filter(t => t.id != id);
+            save(); loadData();
         }
     }
 
-    function toggleExec(id) {
-        const t = transactions.find(x => x.id === id);
-        if(t) {
-            t.executed = !t.executed;
-            localStorage.setItem('transactions_v11', JSON.stringify(transactions));
-            loadData();
-        }
+    function toggleCheck(id) {
+        const t = data.txs.find(x => x.id == id);
+        t.exec = !t.exec;
+        save(); loadData();
     }
 
-    function deleteCategory() {
-        const cat = document.getElementById('category').value;
-        if(cat === 'new') return;
-        if(confirm(`Borrar categoría "${cat}" y sus conceptos?`)) {
-             // Eliminar de arrays
-             appData.categories.income = appData.categories.income.filter(c => c !== cat);
-             appData.categories.expense = appData.categories.expense.filter(c => c !== cat);
-             delete appData.concepts[cat];
-             localStorage.setItem('appData_v11', JSON.stringify(appData));
-             updateCategoryDropdown();
-        }
+    function addMonth(n) {
+        const inp = document.getElementById('dateInput');
+        let [y,m] = inp.value.split('-').map(Number);
+        const d = new Date(y, m-1+n, 1);
+        inp.value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
+        loadData();
     }
 
-    function resetForm() {
-        editingId = null;
-        document.getElementById('transactionForm').reset();
-        document.getElementById('submitBtn').innerText = 'Guardar';
-        document.getElementById('submitBtn').classList.remove('editing');
-        document.getElementById('cancelBtn').style.display = 'none';
-        document.getElementById('date').value = new Date().toISOString().split('T')[0];
-        updateCategoryDropdown();
+    // --- UTILIDADES ---
+    function save() { localStorage.setItem('finData_v12', JSON.stringify(data)); }
+    function backup() { 
+        const a = document.createElement('a'); 
+        a.href = 'data:text/json,'+encodeURIComponent(JSON.stringify(data)); 
+        a.download = 'backup.json'; a.click(); 
+    }
+    function restore(input) {
+        const fr = new FileReader();
+        fr.onload = (e) => { data = JSON.parse(e.target.result); save(); location.reload(); };
+        fr.readAsText(input.files[0]);
     }
 
-    // 6. UTILS CHART & TOOLS
-    let myChart;
-    function renderChart(level, data) {
-        if(!data) data = transactions.filter(t => t.date.startsWith(document.getElementById('currentMonthInput').value));
+    // --- CHART SIMPLE ---
+    let chart;
+    function renderChart(txs) {
+        const ctx = document.getElementById('myChart');
+        if(chart) chart.destroy();
+        const exps = txs.filter(t => t.type === 'exp');
+        const grp = exps.reduce((a,t) => { a[t.cat] = (a[t.cat]||0)+ +t.amount; return a; }, {});
         
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        const expenses = data.filter(t => t.amount < 0);
-        
-        let grouped = {};
-        expenses.forEach(t => {
-            const key = level === 'category' ? t.category : t.text;
-            grouped[key] = (grouped[key] || 0) + Math.abs(t.amount);
-        });
-
-        const labels = Object.keys(grouped);
-        const values = Object.values(grouped);
-        
-        if(myChart) myChart.destroy();
-
-        myChart = new Chart(ctx, {
+        chart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316'],
-                    borderWidth: 0
-                }]
+                labels: Object.keys(grp),
+                datasets: [{ data: Object.values(grp), backgroundColor: ['#EF4444','#F59E0B','#3B82F6','#10B981','#8B5CF6'] }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right', labels: { boxWidth: 10, font: {size: 11} } }
-                },
-                onClick: (evt, item) => {
-                    if(level === 'category' && item.length > 0) {
-                        const idx = item[0].index;
-                        const cat = labels[idx];
-                        // Filtramos solo esa categoría para el detalle
-                        const subData = expenses.filter(t => t.category === cat);
-                        renderChart('concept', subData);
-                        document.getElementById('resetChartBtn').style.display = 'block';
-                    }
-                }
-            }
+            options: { plugins: { legend: { position:'right' } }, maintainAspectRatio: false }
         });
-        
-        if(level === 'category') document.getElementById('resetChartBtn').style.display = 'none';
     }
-
     function toggleView() {
-        const list = document.getElementById('listView');
-        const acc = document.getElementById('accountingView');
-        const btn = document.getElementById('viewName');
-        
+        const list = document.getElementById('txList');
+        const chartBox = document.getElementById('chartView');
+        const label = document.getElementById('viewToggle');
         if(list.style.display !== 'none') {
-            list.style.display = 'none'; acc.style.display = 'block';
-            btn.innerText = 'Vista Contable';
+            list.style.display = 'none'; chartBox.style.display = 'block'; label.innerText = 'Ver Lista';
         } else {
-            list.style.display = 'block'; acc.style.display = 'none';
-            btn.innerText = 'Vista Lista';
+            list.style.display = 'block'; chartBox.style.display = 'none'; label.innerText = 'Ver Gráfico';
         }
-    }
-
-    function downloadData() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({transactions, appData}));
-        const a = document.createElement('a'); a.href = dataStr; a.download = "backup_finanzas.json"; a.click();
-    }
-    
-    function importData(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const json = JSON.parse(e.target.result);
-            if(json.transactions) { transactions = json.transactions; appData = json.appData; }
-            localStorage.setItem('transactions_v11', JSON.stringify(transactions));
-            localStorage.setItem('appData_v11', JSON.stringify(appData));
-            location.reload();
-        };
-        reader.readAsText(file);
     }
 </script>
 </body>
