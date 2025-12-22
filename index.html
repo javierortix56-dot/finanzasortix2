@@ -3,182 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanzas J&M Compact v12.1</title>
+    <title>Finanzas J&M v13</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --bg: #F8F9FA; --surface: #FFFFFF; --primary: #2563EB; 
-            --text-1: #111827; --text-2: #6B7280; --border: #E5E7EB;
-            --success: #059669; --danger: #DC2626;
+            --bg: #F3F4F6; --surface: #FFFFFF; --primary: #2563EB; 
+            --text-1: #1F2937; --text-2: #6B7280; --border: #E5E7EB;
+            --success: #10B981; --danger: #EF4444; --warning: #F59E0B;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0 0 80px 0; color: var(--text-1); font-size: 14px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0 0 100px 0; color: var(--text-1); font-size: 13px; }
 
-        /* HEADER */
-        .top-bar { 
-            background: var(--surface); padding: 10px 15px; position: sticky; top: 0; z-index: 100;
+        /* --- HEADER & NAV --- */
+        .header { 
+            background: var(--surface); padding: 12px 15px; position: sticky; top: 0; z-index: 50;
+            border-bottom: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
-        .logo { font-weight: 700; color: var(--primary); font-size: 15px; display: flex; align-items: center; gap: 6px; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 15px; display: flex; align-items: center; gap: 6px; }
         
-        .month-selector { display: flex; align-items: center; background: #F3F4F6; border-radius: 6px; padding: 2px; }
-        .month-btn { border: none; background: none; padding: 4px 8px; color: var(--text-2); cursor: pointer; }
-        .month-label { font-weight: 600; font-size: 13px; padding: 0 8px; position: relative; }
-        #dateInput { position: absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+        /* Navegación Mes */
+        .month-nav { 
+            display: flex; align-items: center; background: #F9FAFB; border: 1px solid var(--border); 
+            border-radius: 8px; padding: 2px;
+        }
+        .nav-btn { 
+            border: none; background: transparent; padding: 6px 12px; cursor: pointer; 
+            color: var(--text-2); font-size: 14px; display: flex; align-items: center;
+        }
+        .nav-btn:active { color: var(--primary); background: #E5E7EB; border-radius: 6px; }
+        .month-label { 
+            font-weight: 700; font-size: 13px; text-transform: uppercase; padding: 0 8px; 
+            min-width: 80px; text-align: center; position: relative;
+        }
+        #datePicker { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
 
-        /* KPIS */
-        .kpi-scroller { 
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; 
+        /* --- KPIs --- */
+        .kpi-row { 
+            display: flex; gap: 8px; overflow-x: auto; padding: 10px 15px; 
             scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
         }
-        .kpi-card { 
-            min-width: 130px; flex: 1; background: var(--surface); padding: 10px; 
-            border-radius: 10px; border: 1px solid var(--border); scroll-snap-align: start;
-            display: flex; flex-direction: column; justify-content: center;
+        .kpi { 
+            min-width: 120px; flex: 1; background: var(--surface); padding: 8px 12px; 
+            border-radius: 8px; border: 1px solid var(--border); scroll-snap-align: start;
         }
-        .kpi-title { font-size: 10px; color: var(--text-2); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        .kpi-val { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-        .dolar-edit { width: 60px; border: 1px solid var(--border); border-radius: 4px; padding: 2px 4px; font-weight: 600; font-size: 14px; }
+        .kpi-head { font-size: 10px; color: var(--text-2); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
+        .kpi-num { font-size: 16px; font-weight: 700; }
+        .inp-mini { border: 1px solid var(--border); width: 60px; border-radius: 4px; padding: 2px; font-weight: 600; }
 
-        /* ACTIONS */
-        .add-bar { padding: 0 15px; margin-top: 5px; }
-        .btn-add { 
-            width: 100%; background: var(--primary); color: white; border: none; 
-            padding: 10px; border-radius: 8px; font-weight: 600; font-size: 14px;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
+        /* --- TABS VISTA --- */
+        .view-tabs { display: flex; padding: 0 15px; gap: 10px; margin-bottom: 10px; }
+        .tab { 
+            flex: 1; padding: 8px; text-align: center; background: #E5E7EB; 
+            border-radius: 6px; font-weight: 600; color: var(--text-2); font-size: 12px; cursor: pointer; 
         }
+        .tab.active { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
 
-        /* FORM */
-        #formPanel { display: none; background: var(--surface); padding: 15px; border-bottom: 1px solid var(--border); animation: slideDown 0.2s; }
-        @keyframes slideDown { from{transform:translateY(-10px);opacity:0} to{transform:translateY(0);opacity:1}}
-        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .inp { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: white; }
-        .btn-save { background: var(--text-1); color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; }
-        .btn-cancel { background: transparent; color: var(--text-2); width: 100%; padding: 10px; border: none; margin-top: 5px; }
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container { padding: 0 15px; }
 
-        /* LIST */
-        .list-container { background: var(--surface); margin-top: 10px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        .list-header { padding: 10px 15px; font-size: 12px; font-weight: 700; color: var(--text-2); background: #FAFAFA; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        /* --- VISTA T (CONTABLE) --- */
+        .t-container { display: flex; gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .t-col { flex: 1; background: var(--surface); display: flex; flex-direction: column; }
+        .t-head { padding: 8px; text-align: center; font-weight: 700; color: white; font-size: 12px; }
+        .t-head.inc { background: var(--success); }
+        .t-head.exp { background: var(--danger); }
         
-        .txn-item { 
-            display: flex; align-items: center; padding: 12px 15px; 
-            border-bottom: 1px solid var(--border); background: var(--surface);
+        .t-list { padding: 0; margin: 0; list-style: none; }
+        .t-row { 
+            padding: 6px 8px; border-bottom: 1px solid #F3F4F6; font-size: 11px; 
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .txn-icon { 
-            width: 32px; height: 32px; border-radius: 50%; background: #F3F4F6; 
-            display: flex; align-items: center; justify-content: center; margin-right: 12px;
-            color: var(--text-2); font-size: 14px; flex-shrink: 0;
-        }
-        .txn-icon.checked { background: #DCFCE7; color: var(--success); }
-        
-        .txn-info { flex: 1; min-width: 0; }
-        .txn-cat { font-size: 10px; color: var(--text-2); font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 2px;}
-        .txn-title { font-size: 14px; font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-        
-        .txn-right { text-align: right; margin-left: 10px; display: flex; flex-direction: column; align-items: flex-end; }
-        .txn-amount { font-size: 15px; font-weight: 700; display: block; }
-        .neg { color: var(--text-1); } .pos { color: var(--success); }
-        
-        .txn-actions { margin-top: 4px; display: flex; gap: 12px; }
-        .act-btn { color: #9CA3AF; font-size: 12px; background: none; border: none; padding: 2px; }
-        .act-btn:hover { color: var(--primary); }
+        .t-row:last-child { border-bottom: none; }
+        .t-desc { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+        .t-amt { font-weight: 600; }
+        .t-total { padding: 8px; text-align: right; font-weight: 800; font-size: 13px; background: #F9FAFB; border-top: 1px solid var(--border); }
 
-        /* CHART & TOOLS */
-        .chart-box { background: var(--surface); margin: 15px; padding: 15px; border-radius: 10px; border: 1px solid var(--border); height: 220px; }
-        .tools { padding: 20px; text-align: center; }
-        .link { color: var(--primary); text-decoration: none; font-size: 12px; margin: 0 10px; cursor: pointer; }
+        /* --- VISTA LISTA (1 RENGLÓN) --- */
+        .list-row { 
+            background: var(--surface); padding: 0 10px; height: 44px; margin-bottom: 1px;
+            display: grid; grid-template-columns: 30px 25px 1fr auto 40px; align-items: center; gap: 8px;
+            border-bottom: 1px solid #F3F4F6;
+        }
+        .list-row:first-child { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .list-row:last-child { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-bottom: none; }
+        
+        .l-check { font-size: 16px; color: #D1D5DB; display: flex; justify-content: center; }
+        .l-check.done { color: var(--success); }
+        .l-date { font-weight: 700; color: var(--text-2); font-size: 11px; text-align: center; background: #F3F4F6; padding: 2px 0; border-radius: 4px; }
+        .l-desc { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .l-amt { font-weight: 700; font-size: 13px; text-align: right; }
+        .inc { color: var(--success); } .exp { color: var(--text-1); }
+        
+        .l-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .act-btn { border: none; background: none; color: #9CA3AF; padding: 4px; font-size: 12px; }
+
+        /* --- BOTÓN FLOTANTE (FAB) --- */
+        .fab { 
+            position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; 
+            background: var(--primary); color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 4px 12px rgba(37,99,235,0.4); font-size: 24px; cursor: pointer; z-index: 100;
+            transition: transform 0.1s;
+        }
+        .fab:active { transform: scale(0.95); }
+
+        /* --- FORMULARIO MODAL --- */
+        #modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; 
+        }
+        .modal-content { 
+            background: var(--surface); width: 100%; border-top-left-radius: 16px; border-top-right-radius: 16px; 
+            padding: 20px; animation: slideUp 0.2s; 
+        }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .inp-full { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: white; -webkit-appearance: none; }
+        .btn-main { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; }
+        .btn-sec { width: 100%; padding: 12px; background: transparent; color: var(--text-2); border: none; margin-top: 8px; }
+
+        /* DATA TOOLS */
+        .tools { margin-top: 30px; text-align: center; padding-bottom: 20px; }
+        .link { color: var(--primary); text-decoration: underline; font-size: 11px; margin: 0 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="top-bar">
-    <div class="logo"><i class="fas fa-wallet"></i> Javier & Mary</div>
-    <div class="month-selector">
-        <button class="month-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-        <span class="month-label" id="monthTxt">DIC 25 <input type="month" id="dateInput" onchange="loadData()"></span>
-        <button class="month-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
-    </div>
-</div>
-
-<div class="kpi-scroller">
-    <div class="kpi-card" style="border-left: 3px solid var(--primary);">
-        <span class="kpi-title">Dólar Ref.</span>
-        <div style="display:flex; align-items:center; gap:4px;">
-            <span style="color:#9CA3AF">$</span>
-            <input type="number" id="usdRate" class="dolar-edit" value="1200" onchange="calcKPIs()">
+    <div class="header">
+        <div class="logo"><i class="fas fa-wallet"></i> &nbsp;Javier & Mary</div>
+        <div class="month-nav">
+            <button class="nav-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+            <div class="month-label">
+                <span id="monthTxt">DIC 25</span>
+                <input type="month" id="dateInput" onchange="loadData()">
+            </div>
+            <button class="nav-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
-    <div class="kpi-card" style="border-left: 3px solid var(--success);">
-        <span class="kpi-title">Balance</span>
-        <div class="kpi-val" id="kpiBal">$0</div>
-    </div>
-    <div class="kpi-card" style="border-left: 3px solid #0EA5E9;">
-        <span class="kpi-title">Ahorro USD</span>
-        <div class="kpi-val" id="kpiUsd" style="color:#0EA5E9">$0</div>
-    </div>
-</div>
 
-<div class="add-bar">
-    <button class="btn-add" onclick="toggleForm()">
-        <i class="fas fa-plus"></i> Registrar Movimiento
-    </button>
-</div>
-
-<div id="formPanel">
-    <form id="txForm">
-        <div class="form-row">
-            <input type="date" id="fDate" class="inp" required>
-            <input type="number" id="fAmount" class="inp" placeholder="$ Monto" step="0.01" required>
+    <div class="kpi-row">
+        <div class="kpi" style="border-left: 3px solid var(--primary)">
+            <div class="kpi-head">Dólar Ref.</div>
+            <div style="display:flex; align-items:center; gap:4px;">
+                <span style="color:#9CA3AF">$</span>
+                <input type="number" id="usdRate" class="inp-mini" value="1200" onchange="calcKPIs()">
+            </div>
         </div>
-        <div class="form-row">
-            <select id="fType" class="inp" onchange="renderCats()" style="flex:1">
-                <option value="exp">🔴 Gasto</option>
-                <option value="inc">🟢 Ingreso</option>
-            </select>
-            <select id="fCat" class="inp" style="flex:2" onchange="checkNewCat()"></select>
+        <div class="kpi" style="border-left: 3px solid var(--success)">
+            <div class="kpi-head">Balance Mes</div>
+            <div class="kpi-num" id="kpiBal">$0</div>
         </div>
-        <div class="form-row"><input type="text" id="fDesc" class="inp" placeholder="Descripción" required></div>
-        <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
-            <input type="checkbox" id="fExec" checked> Ya pagado/cobrado
-        </label>
-        <button type="submit" id="btnSave" class="btn-save">Guardar</button>
-        <button type="button" onclick="toggleForm()" class="btn-cancel">Cancelar</button>
-    </form>
-</div>
-
-<div class="list-container">
-    <div class="list-header">
-        <span>MOVIMIENTOS</span>
-        <span onclick="toggleView()" id="viewToggle" style="cursor:pointer; color:var(--primary)">Ver Gráfico</span>
+        <div class="kpi" style="border-left: 3px solid #0EA5E9">
+            <div class="kpi-head">Ahorro USD</div>
+            <div class="kpi-num" id="kpiUsd" style="color:#0EA5E9">$0</div>
+        </div>
     </div>
-    <div id="txList"></div>
-    <div id="chartView" class="chart-box" style="display:none; margin:0; border:none;">
-        <canvas id="myChart"></canvas>
-    </div>
-</div>
 
-<div class="tools">
-    <span class="link" onclick="backup()">Descargar Backup</span>
-    <span class="link" onclick="document.getElementById('fileIn').click()">Restaurar</span>
-    <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
-</div>
+    <div class="view-tabs">
+        <div class="tab" id="tab-t" onclick="switchView('t')">Cuenta T</div>
+        <div class="tab" id="tab-list" onclick="switchView('list')">Lista</div>
+        <div class="tab" id="tab-chart" onclick="switchView('chart')">Gráfico</div>
+    </div>
+
+    <div class="main-container">
+        
+        <div id="view-t" style="display:block;">
+            <div class="t-container">
+                <div class="t-col">
+                    <div class="t-head inc">INGRESOS</div>
+                    <ul class="t-list" id="t-list-inc"></ul>
+                    <div class="t-total" id="total-inc" style="color:var(--success)">$0</div>
+                </div>
+                <div class="t-col">
+                    <div class="t-head exp">EGRESOS</div>
+                    <ul class="t-list" id="t-list-exp"></ul>
+                    <div class="t-total" id="total-exp" style="color:var(--danger)">$0</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-list" style="display:none;">
+            <div id="list-rows"></div>
+        </div>
+
+        <div id="view-chart" style="display:none;">
+            <div style="background:white; padding:15px; border-radius:8px; border:1px solid var(--border); height:250px;">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="fab" onclick="openForm()"><i class="fas fa-plus"></i></div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 15px 0; font-size:16px;">Registrar Movimiento</h3>
+            <form id="txForm">
+                <div class="form-grid">
+                    <input type="date" id="fDate" class="inp-full" required>
+                    <input type="number" id="fAmount" class="inp-full" placeholder="$ Monto" required step="0.01">
+                </div>
+                <div class="form-grid">
+                    <select id="fType" class="inp-full" onchange="renderCats()">
+                        <option value="exp">🔴 Gasto</option>
+                        <option value="inc">🟢 Ingreso</option>
+                    </select>
+                    <select id="fCat" class="inp-full" onchange="checkNewCat()"></select>
+                </div>
+                <input type="text" id="fDesc" class="inp-full" placeholder="Concepto / Descripción" required style="margin-bottom:12px;">
+                
+                <label style="display:flex; align-items:center; gap:10px; margin-bottom:15px; font-weight:500;">
+                    <input type="checkbox" id="fExec" checked style="transform:scale(1.2)"> Ya pagado/cobrado
+                </label>
+
+                <button type="submit" id="btnSave" class="btn-main">Guardar Movimiento</button>
+                <button type="button" onclick="closeForm()" class="btn-sec">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="tools">
+        <span class="link" onclick="backup()">Descargar Backup</span>
+        <span class="link" onclick="document.getElementById('fileIn').click()">Restaurar</span>
+        <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
+    </div>
 
 <script>
-    // DATA DEFAULT
-    const defData = { txs: [], cats: { exp:['Esenciales','Deudas','Ocio','Ahorro'], inc:['Sueldo','Ventas'] } };
-    let data = JSON.parse(localStorage.getItem('finData_v12')) || defData;
+    /* --- LÓGICA DEL SISTEMA --- */
+    
+    // Configuración Inicial
+    const defData = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] } };
+    let data = JSON.parse(localStorage.getItem('finData_v13')) || defData;
     let editId = null;
-    let chart;
+    let chartInstance = null;
+    let currentView = localStorage.getItem('lastView') || 't';
 
     window.onload = () => {
         const d = new Date();
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
         document.getElementById('dateInput').value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
         document.getElementById('usdRate').value = localStorage.getItem('usdRate') || 1200;
+        
+        switchView(currentView);
         loadData();
     };
 
@@ -186,89 +257,103 @@
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
         
-        // Render Month Label
+        // Header Mes
         const dateObj = new Date(parseInt(y), parseInt(m)-1, 1);
         const mName = dateObj.toLocaleString('es-ES', {month:'short'}).toUpperCase();
-        document.getElementById('monthTxt').innerHTML = `${mName} ${y.substring(2)} <input type="month" id="dateInput" value="${ym}" onchange="loadData()" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0">`;
+        document.getElementById('monthTxt').innerText = `${mName} ${y.substring(2)}`;
         
-        // Filter & Sort
+        // Filtrar Datos
         const txs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => b.date.localeCompare(a.date));
         
-        renderList(txs);
-        calcKPIs(txs);
+        // Renderizar Vistas
+        renderTView(txs);
+        renderListView(txs);
         renderChart(txs);
-        renderCats();
+        calcKPIs(txs);
     }
 
-    function renderList(txs) {
-        const el = document.getElementById('txList');
-        if(!txs.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#9CA3AF">Sin movimientos este mes</div>'; return; }
+    /* --- VISTA CUENTA T --- */
+    function renderTView(txs) {
+        const incList = document.getElementById('t-list-inc');
+        const expList = document.getElementById('t-list-exp');
+        incList.innerHTML = ''; expList.innerHTML = '';
         
-        el.innerHTML = txs.map(t => {
+        let tInc = 0, tExp = 0;
+
+        txs.forEach(t => {
+            const day = t.date.split('-')[2];
+            const li = document.createElement('li');
+            li.className = 't-row';
+            li.onclick = () => edit(t.id); // Click para editar desde T
+            li.innerHTML = `
+                <div style="display:flex; flex-direction:column; width:100%">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="font-size:9px; color:#9CA3AF; font-weight:700">${day} | ${t.cat.substring(0,8)}</span>
+                        ${!t.exec ? '<i class="fas fa-clock" style="font-size:9px; color:#F59E0B"></i>' : ''}
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="t-desc">${t.desc}</span>
+                        <span class="t-amt">$${Math.abs(t.amount).toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+            
+            if(t.type === 'inc') { incList.appendChild(li); tInc += Math.abs(t.amount); }
+            else { expList.appendChild(li); tExp += Math.abs(t.amount); }
+        });
+
+        document.getElementById('total-inc').innerText = `$${tInc.toLocaleString()}`;
+        document.getElementById('total-exp').innerText = `$${tExp.toLocaleString()}`;
+    }
+
+    /* --- VISTA LISTA 1 RENGLÓN --- */
+    function renderListView(txs) {
+        const div = document.getElementById('list-rows');
+        div.innerHTML = '';
+        
+        if(txs.length === 0) {
+            div.innerHTML = '<div style="padding:20px; text-align:center; color:#ccc">Sin movimientos</div>';
+            return;
+        }
+
+        txs.forEach(t => {
+            const day = t.date.split('-')[2];
             const isInc = t.type === 'inc';
-            return `
-            <div class="txn-item">
-                <div class="txn-icon ${t.exec?'checked':''}" onclick="toggleCheck(${t.id})">
-                    <i class="fas ${t.exec?'fa-check':'fa-clock'}"></i>
-                </div>
-                <div class="txn-info">
-                    <span class="txn-cat">${t.cat}</span>
-                    <span class="txn-title">${t.desc}</span>
-                </div>
-                <div class="txn-right">
-                    <span class="txn-amount ${isInc?'pos':'neg'}">${isInc?'+':''}$${Math.abs(t.amount).toLocaleString()}</span>
-                    <div class="txn-actions">
-                        <button class="act-btn" onclick="edit(${t.id})"><i class="fas fa-pencil-alt"></i></button>
+            
+            div.innerHTML += `
+                <div class="list-row">
+                    <div class="l-check ${t.exec?'done':''}" onclick="toggleCheck(${t.id})">
+                        <i class="fas ${t.exec?'fa-check-circle':'fa-circle'}"></i>
+                    </div>
+                    <div class="l-date">${day}</div>
+                    <div class="l-desc">${t.desc}</div>
+                    <div class="l-amt ${isInc?'inc':'exp'}">${isInc?'+':''}$${Math.abs(t.amount).toLocaleString()}</div>
+                    <div class="l-actions">
+                        <button class="act-btn" onclick="edit(${t.id})"><i class="fas fa-pen"></i></button>
                         <button class="act-btn" onclick="del(${t.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
-            </div>`;
-        }).join('');
+            `;
+        });
     }
 
-    function calcKPIs(txs) {
-        const bal = txs.reduce((acc, t) => acc + (t.type=='inc' ? +t.amount : -t.amount), 0);
-        const rate = +document.getElementById('usdRate').value || 1;
-        localStorage.setItem('usdRate', rate);
-        
-        const bEl = document.getElementById('kpiBal');
-        bEl.innerText = `$${bal.toLocaleString()}`;
-        bEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)';
-        document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`;
-    }
-
-    // FORM
-    function toggleForm() {
-        const p = document.getElementById('formPanel');
-        p.style.display = p.style.display==='block' ? 'none' : 'block';
-        if(p.style.display==='none') resetForm();
+    /* --- GESTIÓN FORMULARIO --- */
+    function openForm() {
+        document.getElementById('modal').style.display = 'flex';
+        renderCats();
+        if(!editId) document.getElementById('fAmount').focus();
     }
     
+    function closeForm() {
+        document.getElementById('modal').style.display = 'none';
+        resetForm();
+    }
+
     function resetForm() {
         editId = null;
         document.getElementById('txForm').reset();
         document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('btnSave').innerText = 'Guardar';
-        renderCats();
-    }
-
-    function renderCats() {
-        const type = document.getElementById('fType').value;
-        const sel = document.getElementById('fCat');
-        sel.innerHTML = '';
-        (data.cats[type] || []).forEach(c => sel.add(new Option(c,c)));
-        sel.add(new Option('+ Crear Categoría', 'new'));
-    }
-
-    function checkNewCat() {
-        if(document.getElementById('fCat').value === 'new') {
-            const n = prompt('Nombre categoría:');
-            if(n) {
-                data.cats[document.getElementById('fType').value].push(n);
-                save(); renderCats();
-                document.getElementById('fCat').value = n;
-            } else renderCats();
-        }
+        document.getElementById('btnSave').innerText = 'Guardar Movimiento';
     }
 
     document.getElementById('txForm').onsubmit = (e) => {
@@ -276,24 +361,32 @@
         const tx = {
             id: editId || Date.now(),
             date: document.getElementById('fDate').value,
-            amount: Math.abs(document.getElementById('fAmount').value),
+            amount: Math.abs(document.getElementById('fAmount').value), // Siempre positivo en BD
             type: document.getElementById('fType').value,
             cat: document.getElementById('fCat').value,
             desc: document.getElementById('fDesc').value,
             exec: document.getElementById('fExec').checked
         };
-        
+
         if(editId) {
             const idx = data.txs.findIndex(t => t.id == editId);
             if(idx !== -1) data.txs[idx] = tx;
         } else {
             data.txs.push(tx);
         }
-        
-        save(); toggleForm(); loadData();
+
+        save(); closeForm(); loadData();
     };
 
-    // ACTIONS
+    /* --- ACCIONES --- */
+    function addMonth(n) {
+        const inp = document.getElementById('dateInput');
+        let [y,m] = inp.value.split('-').map(Number);
+        const d = new Date(y, m-1+n, 1);
+        inp.value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
+        loadData();
+    }
+
     function edit(id) {
         const t = data.txs.find(x => x.id == id);
         if(!t) return;
@@ -306,12 +399,11 @@
         document.getElementById('fDesc').value = t.desc;
         document.getElementById('fExec').checked = t.exec;
         document.getElementById('btnSave').innerText = 'Actualizar';
-        const p = document.getElementById('formPanel');
-        if(p.style.display !== 'block') toggleForm();
+        openForm();
     }
 
     function del(id) {
-        if(confirm('¿Eliminar?')) {
+        if(confirm('¿Borrar este movimiento?')) {
             data.txs = data.txs.filter(t => t.id != id);
             save(); loadData();
         }
@@ -322,100 +414,100 @@
         if(t) { t.exec = !t.exec; save(); loadData(); }
     }
 
-    function addMonth(n) {
-        const inp = document.getElementById('dateInput');
-        let [y,m] = inp.value.split('-').map(Number);
-        const d = new Date(y, m-1+n, 1);
-        inp.value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`;
-        loadData();
+    function switchView(view) {
+        currentView = view;
+        localStorage.setItem('lastView', view);
+        
+        ['t', 'list', 'chart'].forEach(v => {
+            document.getElementById(`view-${v}`).style.display = (v === view) ? 'block' : 'none';
+            document.getElementById(`tab-${v}`).className = (v === view) ? 'tab active' : 'tab';
+        });
     }
 
-    function toggleView() {
-        const lst = document.getElementById('txList');
-        const grf = document.getElementById('chartView');
-        const lbl = document.getElementById('viewToggle');
-        if(lst.style.display !== 'none') {
-            lst.style.display='none'; grf.style.display='block'; lbl.innerText='Ver Lista';
-        } else {
-            lst.style.display='block'; grf.style.display='none'; lbl.innerText='Ver Gráfico';
+    /* --- HELPERS --- */
+    function calcKPIs(txs) {
+        const bal = txs.reduce((acc, t) => acc + (t.type=='inc' ? +t.amount : -t.amount), 0);
+        const rate = +document.getElementById('usdRate').value || 1;
+        localStorage.setItem('usdRate', rate);
+        
+        const bEl = document.getElementById('kpiBal');
+        bEl.innerText = `$${bal.toLocaleString()}`;
+        bEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)';
+        document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`;
+    }
+
+    function renderCats() {
+        const type = document.getElementById('fType').value;
+        const sel = document.getElementById('fCat');
+        sel.innerHTML = '';
+        (data.cats[type] || []).forEach(c => sel.add(new Option(c,c)));
+        sel.add(new Option('+ Crear Categoría', 'new'));
+    }
+
+    function checkNewCat() {
+        if(document.getElementById('fCat').value === 'new') {
+            const n = prompt('Nombre nueva categoría:');
+            if(n) {
+                data.cats[document.getElementById('fType').value].push(n);
+                save(); renderCats();
+                document.getElementById('fCat').value = n;
+            } else renderCats();
         }
     }
 
     function renderChart(txs) {
         const ctx = document.getElementById('myChart');
-        if(chart) chart.destroy();
-        const exps = txs.filter(t => t.type === 'exp');
-        if(!exps.length) return;
+        if(chartInstance) chartInstance.destroy();
         
+        const exps = txs.filter(t => t.type === 'exp');
         const grp = exps.reduce((a,t) => { a[t.cat] = (a[t.cat]||0)+ +t.amount; return a; }, {});
         
-        chart = new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: Object.keys(grp),
-                datasets: [{ data: Object.values(grp), backgroundColor: ['#EF4444','#F59E0B','#3B82F6','#10B981','#8B5CF6','#6366F1'], borderWidth:0 }]
+                datasets: [{ data: Object.values(grp), backgroundColor: ['#EF4444','#F59E0B','#3B82F6','#10B981','#8B5CF6'], borderWidth:0 }]
             },
-            options: { plugins: { legend: { position:'right', labels:{boxWidth:12} } }, maintainAspectRatio: false }
+            options: { plugins: { legend: { position:'right', labels:{boxWidth:12, font:{size:10}} } }, maintainAspectRatio: false }
         });
     }
 
-    // --- SYSTEM ---
-    function save() { localStorage.setItem('finData_v12', JSON.stringify(data)); }
+    /* --- BACKUP SYSTEM (COMPATIBLE V10-V12) --- */
+    function save() { localStorage.setItem('finData_v13', JSON.stringify(data)); }
     function backup() { 
         const a = document.createElement('a'); 
         a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); 
-        a.download = 'backup_v12.json'; a.click(); 
+        a.download = 'backup_v13.json'; a.click(); 
     }
     
-    // RESTAURACIÓN INTELIGENTE (Detecta V10/V11 y convierte a V12)
     function restoreSmart(input) {
         const fr = new FileReader();
         fr.onload = (e) => {
             try {
                 const json = JSON.parse(e.target.result);
                 
-                // CASO 1: Es un backup NUEVO (V12)
-                if(json.txs && Array.isArray(json.txs)) {
+                // Si es formato V13
+                if(json.txs && Array.isArray(json.txs) && json.cats) {
                     data = json;
-                    alert("Backup V12 restaurado con éxito.");
                 } 
-                // CASO 2: Es un backup VIEJO (V10/V11 - tiene 'transactions')
-                else if(json.transactions && Array.isArray(json.transactions)) {
-                    if(confirm("Backup antiguo detectado. ¿Convertir al nuevo formato?")) {
-                        // Migrar datos
+                // Si es formato antiguo (V10-V11)
+                else if(json.transactions) {
+                    if(confirm("Formato antiguo detectado. ¿Convertir?")) {
                         const newTxs = json.transactions.map(t => ({
                             id: t.id || Date.now(),
                             date: t.date,
-                            // Si era negativo (-500) es gasto, si positivo ingreso. Guardamos absoluto.
                             amount: Math.abs(t.amount),
                             type: t.amount < 0 ? 'exp' : 'inc',
                             cat: t.category,
-                            desc: t.text || t.concept || 'Sin descripción',
+                            desc: t.text || 'Sin descripción',
                             exec: t.executed !== false
                         }));
-                        
-                        // Migrar categorías si existen
-                        let newCats = { exp:[], inc:[] };
-                        if(json.appData && json.appData.categories) {
-                            newCats.exp = json.appData.categories.expense || ['Varios'];
-                            newCats.inc = json.appData.categories.income || ['Varios'];
-                        } else {
-                            newCats = defData.cats;
-                        }
-
-                        data = { txs: newTxs, cats: newCats };
-                        alert("Conversión exitosa. Datos antiguos recuperados.");
-                    } else { return; }
-                } else {
-                    alert("Formato de archivo no reconocido.");
-                    return;
+                        data = { txs: newTxs, cats: defData.cats };
+                    } else return;
                 }
-
-                save();
-                location.reload();
-            } catch(err) {
-                alert("Error al leer el archivo: " + err);
-            }
+                
+                save(); location.reload();
+            } catch(err) { alert("Error al leer archivo"); }
         };
         fr.readAsText(input.files[0]);
     }
