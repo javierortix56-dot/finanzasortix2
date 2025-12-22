@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanzas J&M v14.1</title>
+    <title>Finanzas J&M v15</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,21 +25,31 @@
         }
         .logo { font-weight: 800; color: var(--primary); font-size: 15px; display: flex; align-items: center; gap: 6px; }
         
-        /* NAV MES */
+        /* NAV MES (CORREGIDO Z-INDEX) */
         .month-nav { 
             display: flex; align-items: center; background: #F9FAFB; border: 1px solid var(--border); 
-            border-radius: 8px; padding: 2px;
+            border-radius: 8px; padding: 2px; position: relative;
         }
         .nav-btn { 
             border: none; background: transparent; padding: 8px 14px; cursor: pointer; 
             color: var(--text-2); font-size: 14px; display: flex; align-items: center;
+            position: relative; z-index: 20; /* Flechas por encima del input */
         }
         .nav-btn:active { background: #E5E7EB; border-radius: 6px; color: var(--primary); }
+        
         .month-label { 
             font-weight: 700; font-size: 13px; text-transform: uppercase; padding: 0 5px; 
             min-width: 75px; text-align: center; position: relative;
         }
-        #dateInput { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; }
+        /* El input solo cubre el texto del mes, no las flechas */
+        #dateInput { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; z-index: 10; cursor: pointer; }
+
+        /* HEADER ADD BTN */
+        .btn-header-add {
+            background: var(--primary); color: white; border: none; border-radius: 6px;
+            width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; margin-left: 10px;
+        }
 
         /* KPIs */
         .kpi-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 15px; }
@@ -59,16 +69,29 @@
         /* MAIN CONTENT */
         .main-container { padding: 0 15px; }
 
-        /* VISTA T */
+        /* VISTA T (COMPACTA CORREGIDA) */
         .t-container { display: flex; gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         .t-col { flex: 1; background: var(--surface); display: flex; flex-direction: column; }
         .t-head { padding: 8px; text-align: center; font-weight: 700; color: white; font-size: 12px; }
         .t-head.inc { background: var(--success); }
         .t-head.exp { background: var(--danger); }
         .t-list { padding: 0; margin: 0; list-style: none; }
-        .t-row { padding: 8px; border-bottom: 1px solid #F3F4F6; font-size: 11px; cursor: pointer; }
-        .t-desc { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display:block; margin-top:2px; }
-        .t-amt { font-weight: 700; float: right; font-size: 12px; }
+        
+        /* UN SOLO RENGLON */
+        .t-row { 
+            padding: 8px 6px; border-bottom: 1px solid #F3F4F6; font-size: 11px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; gap: 6px;
+        }
+        .t-date-badge { 
+            font-weight: 700; color: var(--text-2); font-size: 10px; min-width: 20px; text-align: center; 
+        }
+        .date-alert { color: var(--danger); font-weight: 800; background: #FEF2F2; border-radius: 4px; padding: 1px 3px; }
+
+        .t-desc { 
+            font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            flex: 1; /* Ocupa el espacio disponible */
+        }
+        .t-amt { font-weight: 700; font-size: 12px; white-space: nowrap; }
         .t-total { padding: 8px; text-align: right; font-weight: 800; font-size: 13px; background: #F9FAFB; border-top: 1px solid var(--border); }
 
         /* VISTA LISTA */
@@ -109,15 +132,9 @@
         .btn-main { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 10px; }
         .btn-sec { width: 100%; padding: 12px; background: transparent; color: var(--text-2); border: none; margin-top: 5px; }
 
-        /* DATA TOOLS - BACKUP RESTORE */
-        .tools { 
-            margin-top: 40px; padding: 20px; text-align: center; 
-            background: #F9FAFB; border-top: 1px solid var(--border);
-        }
-        .link { 
-            color: var(--primary); text-decoration: none; font-size: 12px; font-weight: 600;
-            margin: 0 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-        }
+        /* TOOLS */
+        .tools { margin-top: 40px; padding: 20px; text-align: center; background: #F9FAFB; border-top: 1px solid var(--border); }
+        .link { color: var(--primary); text-decoration: none; font-size: 12px; font-weight: 600; margin: 0 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         
         #chartBackBtn { display:none; width:100%; margin-top:10px; background:#E5E7EB; color:var(--text-1); border:none; padding:8px; border-radius:6px; font-weight:600; }
     </style>
@@ -126,13 +143,16 @@
 
     <div class="header">
         <div class="logo"><i class="fas fa-wallet"></i> &nbsp;J&M</div>
-        <div class="month-nav">
-            <button class="nav-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="month-label">
-                <span id="monthTxt">DIC 25</span>
-                <input type="month" id="dateInput" onchange="loadData()">
+        <div style="display:flex; align-items:center;">
+            <div class="month-nav">
+                <button class="nav-btn" onclick="addMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="month-label">
+                    <span id="monthTxt">DIC 25</span>
+                    <input type="month" id="dateInput" onchange="loadData()">
+                </div>
+                <button class="nav-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <button class="nav-btn" onclick="addMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            <button class="btn-header-add" onclick="openForm()"><i class="fas fa-plus"></i></button>
         </div>
     </div>
 
@@ -141,7 +161,7 @@
             <div class="kpi-head">Dólar Ref.</div>
             <div style="display:flex; align-items:center; gap:4px;">
                 <span style="color:#9CA3AF">$</span>
-                <input type="number" id="usdRate" class="inp-mini" value="1200" onchange="calcKPIs()">
+                <input type="number" id="usdRate" class="inp-mini" value="1200" onchange="loadData()">
             </div>
         </div>
         <div class="kpi" style="border-left: 3px solid var(--success)">
@@ -228,7 +248,6 @@
     </div>
 
 <script>
-    /* DATOS CON CONCEPTOS ANIDADOS */
     const defData = { 
         txs: [], 
         cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] },
@@ -243,10 +262,10 @@
         }
     };
     
-    let data = JSON.parse(localStorage.getItem('finData_v14')) || defData;
+    let data = JSON.parse(localStorage.getItem('finData_v15')) || defData;
     let editId = null;
     let chartInstance = null;
-    let chartViewLevel = 'root'; // 'root' or 'detail'
+    let chartViewLevel = 'root'; 
     let currentView = localStorage.getItem('lastView') || 't';
 
     window.onload = () => {
@@ -270,20 +289,38 @@
         renderTView(txs); renderListView(txs); renderChart(txs); calcKPIs(txs);
     }
 
-    /* RENDER VISTAS */
+    /* VISTA T COMPACTA Y ALERTA FECHAS */
     function renderTView(txs) {
         const incList = document.getElementById('t-list-inc');
         const expList = document.getElementById('t-list-exp');
         incList.innerHTML = ''; expList.innerHTML = '';
         let tInc = 0, tExp = 0;
 
+        const today = new Date(); today.setHours(0,0,0,0);
+
         txs.forEach(t => {
             const day = t.date.split('-')[2];
+            const txDate = new Date(t.date + 'T00:00:00');
+            const diffTime = txDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Lógica alerta: Si faltan 5 días o menos (y es futuro o hoy) y NO está pagado
+            // O si te gusta que marque siempre que esté cerca la fecha:
+            const isNear = diffDays >= 0 && diffDays <= 5; 
+            const dateClass = isNear ? 'date-alert' : '';
+
             const li = document.createElement('li');
             li.className = 't-row'; li.onclick = () => edit(t.id);
             li.innerHTML = `
-                <div><span style="font-size:10px; color:#6B7280; font-weight:700">${day} | ${t.cat.substring(0,8)}</span><span class="t-desc">${t.desc}</span></div>
-                <div style="text-align:right">${!t.exec ? '<i class="fas fa-clock" style="font-size:10px; color:#F59E0B"></i> ' : ''}<span class="t-amt">$${Math.abs(t.amount).toLocaleString()}</span></div>`;
+                <div style="display:flex; gap:6px; align-items:center; flex:1; min-width:0;">
+                    <span class="t-date-badge ${dateClass}">${day}</span>
+                    <span class="t-desc">${t.desc}</span>
+                </div>
+                <div style="text-align:right">
+                     ${!t.exec ? '<i class="fas fa-clock" style="font-size:10px; color:#F59E0B"></i>' : ''}
+                    <span class="t-amt">$${Math.abs(t.amount).toLocaleString()}</span>
+                </div>`;
+            
             if(t.type === 'inc') { incList.appendChild(li); tInc += Math.abs(t.amount); }
             else { expList.appendChild(li); tExp += Math.abs(t.amount); }
         });
@@ -294,12 +331,21 @@
     function renderListView(txs) {
         const div = document.getElementById('list-rows');
         div.innerHTML = txs.length ? '' : '<div style="padding:20px; text-align:center; color:#ccc">Sin movimientos</div>';
+        
+        const today = new Date(); today.setHours(0,0,0,0);
+
         txs.forEach(t => {
-            const day = t.date.split('-')[2]; const isInc = t.type === 'inc';
+            const day = t.date.split('-')[2]; 
+            const isInc = t.type === 'inc';
+            
+            const txDate = new Date(t.date + 'T00:00:00');
+            const diffDays = Math.ceil((txDate - today) / (1000 * 60 * 60 * 24));
+            const isNear = diffDays >= 0 && diffDays <= 5;
+            
             div.innerHTML += `
                 <div class="list-row">
                     <div class="l-check ${t.exec?'done':''}" onclick="toggleCheck(${t.id})"><i class="fas ${t.exec?'fa-check-circle':'fa-circle'}"></i></div>
-                    <div class="l-date">${day}</div>
+                    <div class="l-date ${isNear ? 'date-alert' : ''}">${day}</div>
                     <div class="l-desc">${t.desc}</div>
                     <div class="l-amt ${isInc?'inc':'exp'}">${isInc?'+':''}$${Math.abs(t.amount).toLocaleString()}</div>
                     <div class="l-actions"><button class="act-btn" onclick="edit(${t.id})"><i class="fas fa-pen"></i></button><button class="act-btn" onclick="del(${t.id})"><i class="fas fa-trash"></i></button></div>
@@ -307,12 +353,10 @@
         });
     }
 
-    /* FORM & LOGICA DESPLEGABLES */
     function openForm() { document.getElementById('modal').style.display = 'flex'; renderCats(); if(!editId) document.getElementById('fAmount').focus(); }
     function closeForm() { document.getElementById('modal').style.display = 'none'; resetForm(); }
     function resetForm() { editId = null; document.getElementById('txForm').reset(); document.getElementById('fDate').value = new Date().toISOString().split('T')[0]; document.getElementById('btnSave').innerText = 'Guardar'; document.getElementById('fConceptCustom').style.display='none'; }
 
-    // 1. Renderiza Categorias
     function renderCats() {
         const sel = document.getElementById('fCat'); sel.innerHTML = '';
         (data.cats[document.getElementById('fType').value] || []).forEach(c => sel.add(new Option(c,c))); 
@@ -320,11 +364,9 @@
         renderConcepts();
     }
 
-    // 2. Renderiza Conceptos según Categoría seleccionada
     function renderConcepts() {
         const cat = document.getElementById('fCat').value;
         if(cat === 'new_cat') { checkNewCat(); return; }
-
         const sel = document.getElementById('fConcept'); sel.innerHTML = '';
         const concepts = data.concepts[cat] || [];
         concepts.forEach(c => sel.add(new Option(c,c)));
@@ -337,7 +379,7 @@
             const n = prompt('Nueva Categoría:');
             if(n) {
                 data.cats[document.getElementById('fType').value].push(n);
-                data.concepts[n] = []; // Iniciar array vacio
+                data.concepts[n] = [];
                 save(); renderCats(); document.getElementById('fCat').value = n; renderConcepts();
             } else renderCats();
         }
@@ -346,29 +388,19 @@
     function checkNewConcept() {
         const val = document.getElementById('fConcept').value;
         const customInp = document.getElementById('fConceptCustom');
-        if(val === 'new_con') {
-            customInp.style.display = 'block'; customInp.required = true; customInp.focus();
-        } else {
-            customInp.style.display = 'none'; customInp.required = false;
-        }
+        if(val === 'new_con') { customInp.style.display = 'block'; customInp.required = true; customInp.focus(); } 
+        else { customInp.style.display = 'none'; customInp.required = false; }
     }
 
     document.getElementById('txForm').onsubmit = (e) => {
         e.preventDefault();
-        
         let finalDesc = document.getElementById('fConcept').value;
         const cat = document.getElementById('fCat').value;
-        
-        // Guardar nuevo concepto si aplica
         if(finalDesc === 'new_con') {
             finalDesc = document.getElementById('fConceptCustom').value;
             if(!data.concepts[cat]) data.concepts[cat] = [];
-            if(!data.concepts[cat].includes(finalDesc)) {
-                data.concepts[cat].push(finalDesc);
-                save();
-            }
+            if(!data.concepts[cat].includes(finalDesc)) { data.concepts[cat].push(finalDesc); save(); }
         }
-
         const tx = {
             id: editId || Date.now(),
             date: document.getElementById('fDate').value,
@@ -382,27 +414,20 @@
         save(); closeForm(); loadData();
     };
 
-    /* CHART DRILL-DOWN */
     function renderChart(txs, filterCat = null) {
         const ctx = document.getElementById('myChart');
         if(chartInstance) chartInstance.destroy();
-        
         const exps = txs.filter(t => t.type === 'exp');
         let dataMap = {};
 
         if (!filterCat) {
-            // Nivel Raiz: Agrupar por Categoria
-            chartViewLevel = 'root';
-            document.getElementById('chartBackBtn').style.display = 'none';
+            chartViewLevel = 'root'; document.getElementById('chartBackBtn').style.display = 'none';
             dataMap = exps.reduce((a,t) => { a[t.cat] = (a[t.cat]||0)+ +t.amount; return a; }, {});
         } else {
-            // Nivel Detalle: Agrupar por Concepto (filtrado por categoria)
-            chartViewLevel = 'detail';
-            document.getElementById('chartBackBtn').style.display = 'block';
+            chartViewLevel = 'detail'; document.getElementById('chartBackBtn').style.display = 'block';
             document.getElementById('chartBackBtn').innerText = `⬅ Volver (${filterCat})`;
             dataMap = exps.filter(t => t.cat === filterCat).reduce((a,t) => { a[t.desc] = (a[t.desc]||0)+ +t.amount; return a; }, {});
         }
-
         const labels = Object.keys(dataMap);
         const values = Object.values(dataMap);
         const colors = ['#EF4444','#F59E0B','#3B82F6','#10B981','#8B5CF6','#EC4899','#6366F1'];
@@ -415,73 +440,53 @@
                 plugins: { legend: { position:'right', labels:{boxWidth:12, font:{size:10}} } },
                 onClick: (evt, items) => {
                     if (items.length > 0 && chartViewLevel === 'root') {
-                        const idx = items[0].index;
-                        const selectedCat = labels[idx];
-                        renderChart(txs, selectedCat); // Drill down
+                        const idx = items[0].index; renderChart(txs, labels[idx]);
                     }
                 }
             }
         });
     }
 
-    function resetChart() { loadData(); } // Vuelve a cargar todo (root)
-
-    /* ACCIONES & TOOLS */
+    function resetChart() { loadData(); }
     function addMonth(n) { const inp = document.getElementById('dateInput'); let [y,m] = inp.value.split('-').map(Number); const d = new Date(y, m-1+n, 1); inp.value = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`; loadData(); }
     function edit(id) { 
         const t = data.txs.find(x => x.id == id); if(!t) return; editId = id; 
         document.getElementById('fDate').value = t.date; document.getElementById('fAmount').value = t.amount; document.getElementById('fType').value = t.type; 
         renderCats(); document.getElementById('fCat').value = t.cat; 
         renderConcepts(); document.getElementById('fConcept').value = t.desc;
-        // Si el concepto no está en la lista (legacy), ponerlo en custom
-        if(!document.getElementById('fConcept').value) {
-            const opt = new Option(t.desc, t.desc);
-            document.getElementById('fConcept').add(opt);
-            document.getElementById('fConcept').value = t.desc;
-        }
+        if(!document.getElementById('fConcept').value) { const opt = new Option(t.desc, t.desc); document.getElementById('fConcept').add(opt); document.getElementById('fConcept').value = t.desc; }
         document.getElementById('fExec').checked = t.exec; document.getElementById('btnSave').innerText = 'Actualizar'; openForm(); 
     }
     function del(id) { if(confirm('¿Eliminar?')) { data.txs = data.txs.filter(t => t.id != id); save(); loadData(); } }
     function toggleCheck(id) { const t = data.txs.find(x => x.id == id); if(t) { t.exec = !t.exec; save(); loadData(); } }
     function switchView(view) { currentView = view; localStorage.setItem('lastView', view); ['t', 'list', 'chart'].forEach(v => { document.getElementById(`view-${v}`).style.display = (v === view) ? 'block' : 'none'; document.getElementById(`tab-${v}`).className = (v === view) ? 'tab active' : 'tab'; }); }
-    function calcKPIs(txs) { const bal = txs.reduce((acc, t) => acc + (t.type=='inc' ? +t.amount : -t.amount), 0); const rate = +document.getElementById('usdRate').value || 1; localStorage.setItem('usdRate', rate); const bEl = document.getElementById('kpiBal'); bEl.innerText = `$${bal.toLocaleString()}`; bEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)'; document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`; }
     
-    function save() { localStorage.setItem('finData_v14', JSON.stringify(data)); }
+    function calcKPIs(txs) { 
+        const bal = txs.reduce((acc, t) => acc + (t.type=='inc' ? +t.amount : -t.amount), 0); 
+        const rate = +document.getElementById('usdRate').value || 1; 
+        localStorage.setItem('usdRate', rate); 
+        const bEl = document.getElementById('kpiBal'); 
+        bEl.innerText = `$${bal.toLocaleString()}`; 
+        bEl.style.color = bal >= 0 ? 'var(--text-1)' : 'var(--danger)'; 
+        document.getElementById('kpiUsd').innerText = `US$ ${(bal/rate).toFixed(2)}`; 
+    }
+    
+    function save() { localStorage.setItem('finData_v15', JSON.stringify(data)); }
     function backup() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download = 'backup.json'; a.click(); }
-    
-    // RESTAURACIÓN INTELIGENTE V14 (Detecta estructuras viejas y las migra)
     function restoreSmart(input) {
         const fr = new FileReader();
         fr.onload = (e) => {
             try { const json = JSON.parse(e.target.result);
-                // Si es V14 (tiene txs y concepts)
-                if(json.txs && json.concepts) { 
-                    data = json; 
-                } 
-                // Si es V12/V13 (tiene txs pero no concepts)
-                else if(json.txs) { 
-                    data.txs = json.txs;
-                    // Mantenemos los conceptos por defecto o los actuales
-                } 
-                // Si es V10/V11 (tiene transactions array antiguo)
+                if(json.txs && json.concepts) { data = json; } 
+                else if(json.txs) { data.txs = json.txs; } 
                 else if(json.transactions) {
                     if(confirm("Formato antiguo. ¿Convertir?")) {
-                         data.txs = json.transactions.map(t => ({
-                            id: t.id || Date.now(),
-                            date: t.date,
-                            amount: Math.abs(t.amount),
-                            type: t.amount < 0 ? 'exp' : 'inc',
-                            cat: t.category,
-                            desc: t.text || 'Sin descripción',
-                            exec: t.executed !== false
-                        }));
+                         data.txs = json.transactions.map(t => ({ id: t.id||Date.now(), date: t.date, amount: Math.abs(t.amount), type: t.amount<0?'exp':'inc', cat: t.category, desc: t.text||'Sin desc', exec: t.executed!==false }));
                     } else return;
                 }
                 save(); location.reload();
             } catch(err) { alert("Error al leer archivo"); }
-        }; 
-        fr.readAsText(input.files[0]);
-        input.value = ''; // Reset para permitir cargar el mismo archivo si falló
+        }; fr.readAsText(input.files[0]); input.value = '';
     }
 </script>
 </body>
