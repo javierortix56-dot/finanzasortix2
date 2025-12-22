@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanzas J&M v14</title>
+    <title>Finanzas J&M v14.1</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -109,9 +109,15 @@
         .btn-main { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; margin-top: 10px; }
         .btn-sec { width: 100%; padding: 12px; background: transparent; color: var(--text-2); border: none; margin-top: 5px; }
 
-        /* DATA TOOLS */
-        .tools { margin-top: 40px; text-align: center; padding-bottom: 30px; }
-        .link { color: var(--primary); text-decoration: underline; font-size: 12px; margin: 0 10px; cursor: pointer; }
+        /* DATA TOOLS - BACKUP RESTORE */
+        .tools { 
+            margin-top: 40px; padding: 20px; text-align: center; 
+            background: #F9FAFB; border-top: 1px solid var(--border);
+        }
+        .link { 
+            color: var(--primary); text-decoration: none; font-size: 12px; font-weight: 600;
+            margin: 0 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+        }
         
         #chartBackBtn { display:none; width:100%; margin-top:10px; background:#E5E7EB; color:var(--text-1); border:none; padding:8px; border-radius:6px; font-weight:600; }
     </style>
@@ -216,8 +222,8 @@
     </div>
 
     <div class="tools">
-        <span class="link" onclick="backup()">Backup</span>
-        <span class="link" onclick="document.getElementById('fileIn').click()">Restaurar</span>
+        <span class="link" onclick="backup()"><i class="fas fa-download"></i> Guardar Copia</span>
+        <span class="link" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar Copia</span>
         <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
     </div>
 
@@ -442,15 +448,40 @@
     
     function save() { localStorage.setItem('finData_v14', JSON.stringify(data)); }
     function backup() { const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download = 'backup.json'; a.click(); }
+    
+    // RESTAURACIÓN INTELIGENTE V14 (Detecta estructuras viejas y las migra)
     function restoreSmart(input) {
         const fr = new FileReader();
         fr.onload = (e) => {
             try { const json = JSON.parse(e.target.result);
-                if(json.txs && json.concepts) data = json; 
-                else if(json.txs) { data.txs = json.txs; } // V13 a V14
+                // Si es V14 (tiene txs y concepts)
+                if(json.txs && json.concepts) { 
+                    data = json; 
+                } 
+                // Si es V12/V13 (tiene txs pero no concepts)
+                else if(json.txs) { 
+                    data.txs = json.txs;
+                    // Mantenemos los conceptos por defecto o los actuales
+                } 
+                // Si es V10/V11 (tiene transactions array antiguo)
+                else if(json.transactions) {
+                    if(confirm("Formato antiguo. ¿Convertir?")) {
+                         data.txs = json.transactions.map(t => ({
+                            id: t.id || Date.now(),
+                            date: t.date,
+                            amount: Math.abs(t.amount),
+                            type: t.amount < 0 ? 'exp' : 'inc',
+                            cat: t.category,
+                            desc: t.text || 'Sin descripción',
+                            exec: t.executed !== false
+                        }));
+                    } else return;
+                }
                 save(); location.reload();
-            } catch(err) { alert("Error"); }
-        }; fr.readAsText(input.files[0]);
+            } catch(err) { alert("Error al leer archivo"); }
+        }; 
+        fr.readAsText(input.files[0]);
+        input.value = ''; // Reset para permitir cargar el mismo archivo si falló
     }
 </script>
 </body>
