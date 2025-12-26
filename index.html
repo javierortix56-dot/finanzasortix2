@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V32 DrillDown</title>
+    <title>J&M V33 Leyendas</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -91,7 +91,6 @@
             background: white; padding: 10px 8px;
             border-bottom: 1px solid #F1F5F9; cursor: pointer;
         }
-        /* CAMBIO: Nombre Grande, Categoria Pequeña */
         .row-main { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; line-height: 1.2; }
         .row-sub { display: flex; justify-content: space-between; align-items: center; }
         .row-cat { font-size: 9px; font-weight: 600; color: var(--text-gray); background: #F8FAFC; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; }
@@ -109,9 +108,10 @@
         .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
         .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
         
+        /* Aumenté height para que quepa la leyenda */
         .chart-box { 
             background: var(--surface); margin: 0 15px; padding: 15px; 
-            border-radius: 16px; border: 1px solid var(--border); height: 260px; position: relative;
+            border-radius: 16px; border: 1px solid var(--border); height: 320px; position: relative;
         }
 
         .action-btns { padding: 20px; display: flex; gap: 10px; }
@@ -196,8 +196,8 @@
 </div>
 <div class="chart-box">
     <canvas id="myChart"></canvas>
-    <div id="chartCenterText" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#64748B; pointer-events:none; font-weight:600;">
-        Toca para detalle
+    <div id="chartCenterText" style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); font-size:10px; color:#64748B; pointer-events:none; font-weight:600; text-align:center;">
+        Toca para<br>detalle
     </div>
 </div>
 
@@ -270,10 +270,8 @@
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; setTimeout(resetForm,300); }
     
-    // --- NAV MONTH FUNCIONAL ---
     function navMonth(n) { 
         const i = document.getElementById('dateInput'); let [y,m]=i.value.split('-'); 
-        // Crear fecha segura usando dia 1 para evitar saltos de mes en dias 31
         const newDate = new Date(parseInt(y), parseInt(m)-1+n, 1);
         const newY = newDate.getFullYear();
         const newM = String(newDate.getMonth() + 1).padStart(2, '0');
@@ -287,11 +285,10 @@
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
         
-        // --- ORDENAMIENTO ASCENDENTE (1 arriba, 31 abajo) ---
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => a.date.localeCompare(b.date));
         
         renderLists(currentTxs);
-        resetChart(); // Reiniciar gráfico a vista general
+        resetChart();
         renderCats();
         localStorage.setItem('usdRate', document.getElementById('usdRate').value);
     }
@@ -337,7 +334,6 @@
         document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
     }
 
-    // --- CHART DRILL DOWN ---
     function resetChart() { renderChart(currentTxs, null); }
 
     function renderChart(txs, filterCat) {
@@ -348,17 +344,14 @@
         const btnReset = document.getElementById('chartReset');
         const centerTxt = document.getElementById('chartCenterText');
 
-        // Solo Egresos
         let exps = txs.filter(t => t.type === 'exp');
         let map = {};
 
         if (!filterCat) {
-            // Nivel 1: Categorías
             btnReset.style.display = 'none';
-            centerTxt.innerText = "Toca para Detalle";
+            centerTxt.innerHTML = "Toca para<br>detalle";
             map = exps.reduce((a,t)=>{ a[t.cat]=(a[t.cat]||0)+t.amount; return a; }, {});
         } else {
-            // Nivel 2: Conceptos (Drill Down)
             btnReset.style.display = 'block';
             centerTxt.innerText = filterCat;
             map = exps.filter(t => t.cat === filterCat).reduce((a,t)=>{ a[t.desc]=(a[t.desc]||0)+t.amount; return a; }, {});
@@ -379,7 +372,19 @@
             },
             options: { 
                 responsive:true, maintainAspectRatio:false, cutout:'60%',
-                plugins: { legend: { display: false } },
+                plugins: { 
+                    // LEYENDA ACTIVADA AQUÍ
+                    legend: { 
+                        display: true, 
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            font: { size: 10, family: 'Inter' },
+                            padding: 15,
+                            color: '#64748B'
+                        }
+                    } 
+                },
                 onClick: (e, elements) => {
                     if (elements.length > 0 && !filterCat) {
                         const i = elements[0].index;
@@ -390,7 +395,6 @@
         });
     }
 
-    // --- FORM LOGIC ---
     function setType(t) {
         document.getElementById('fType').value = t;
         document.getElementById('sw-inc').className = `sw-item ${t=='inc'?'active inc':''}`;
