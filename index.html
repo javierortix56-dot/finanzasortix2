@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V31 Stable</title>
+    <title>J&M V32 DrillDown</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,59 +23,61 @@
         
         body { 
             font-family: 'Inter', sans-serif; background: var(--bg-app); 
-            margin: 0; color: var(--text-dark); padding-bottom: 100px; /* Espacio para que el FAB no tape nada */
+            margin: 0; color: var(--text-dark); padding-bottom: 100px;
         }
 
-        /* --- HEADER FIXED --- */
+        /* --- HEADER --- */
         .top-bar {
             background: var(--surface); height: 60px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 50;
         }
-        .brand { font-weight: 900; color: var(--primary); font-size: 18px; letter-spacing: -0.5px; }
+        .brand { font-weight: 900; color: var(--primary); font-size: 18px; }
         
-        .date-cmd { 
+        .date-ctrl { 
             display: flex; align-items: center; background: #F1F5F9; 
-            border-radius: 8px; padding: 2px;
+            border-radius: 8px; padding: 2px; border: 1px solid var(--border);
         }
-        .btn-cmd { 
-            background: transparent; border: none; padding: 6px 12px; 
-            cursor: pointer; color: var(--text-dark); font-size: 14px; display: flex; align-items: center;
+        .btn-arrow { 
+            background: transparent; border: none; width: 36px; height: 32px;
+            cursor: pointer; color: var(--text-dark); font-size: 14px; display: flex; align-items: center; justify-content: center;
         }
-        .date-label { 
+        .btn-arrow:active { background: #CBD5E1; border-radius: 6px; }
+        
+        .date-display { 
             font-size: 12px; font-weight: 700; text-transform: uppercase; 
-            min-width: 90px; text-align: center;
+            min-width: 90px; text-align: center; position: relative;
         }
 
-        /* --- BALANCE CARD --- */
+        /* --- BALANCE --- */
         .kpi-wrapper { padding: 15px 15px 5px 15px; }
         .kpi-card {
             background: var(--surface); padding: 20px; border-radius: 16px;
             border: 1px solid var(--border); text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
         .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .kpi-val { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text-dark); line-height: 1.1; }
+        
         .kpi-sub { 
-            margin-top: 8px; padding-top: 8px; border-top: 1px solid #F1F5F9;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid #F1F5F9;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
             font-size: 13px; font-weight: 600; color: var(--text-gray);
         }
         .usd-edit { 
-            background: #F1F5F9; border: none; width: 50px; text-align: center; 
-            border-radius: 4px; font-size: 12px; padding: 2px; color: var(--text-dark); font-weight: 700;
+            background: #F1F5F9; border: 1px solid var(--border); width: 60px; text-align: right; 
+            border-radius: 4px; font-size: 12px; padding: 4px; color: var(--text-dark); font-weight: 700;
         }
 
-        /* --- T-VIEW COLUMNS --- */
+        /* --- T-VIEW --- */
         .t-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-            padding: 15px; align-items: start; /* Importante: Alinea al inicio para que no estire */
+            padding: 15px; align-items: start;
         }
         .t-col { 
             background: var(--surface); border-radius: 12px; 
             border: 1px solid var(--border); overflow: hidden;
         }
-        
         .col-header { 
             padding: 8px; text-align: center; font-size: 11px; font-weight: 800; 
             text-transform: uppercase; color: white; letter-spacing: 0.5px;
@@ -83,74 +85,68 @@
         .bg-inc { background: var(--inc-color); }
         .bg-exp { background: var(--exp-color); }
         .col-total { display: block; background: rgba(0,0,0,0.1); margin-top: 2px; border-radius: 4px; padding: 2px; }
-
-        /* --- ROW ITEMS (Mejorados) --- */
-        .t-list { padding: 5px; }
+        
+        .t-list { padding: 0; }
         .row-item {
-            background: white; margin-bottom: 6px; padding: 8px;
+            background: white; padding: 10px 8px;
             border-bottom: 1px solid #F1F5F9; cursor: pointer;
         }
-        .row-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-        
-        /* CORRECCIÓN: Nombre GRANDE, Categoría PEQUEÑA */
-        .row-desc { font-size: 13px; font-weight: 700; color: var(--text-dark); line-height: 1.2; padding-right: 5px; }
-        .row-cat { font-size: 10px; font-weight: 500; color: var(--text-gray); background: #F8FAFC; padding: 2px 5px; border-radius: 4px; display: inline-block; }
-        
-        .row-bot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
-        .row-date { font-size: 10px; font-weight: 700; color: #94A3B8; }
+        /* CAMBIO: Nombre Grande, Categoria Pequeña */
+        .row-main { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; line-height: 1.2; }
+        .row-sub { display: flex; justify-content: space-between; align-items: center; }
+        .row-cat { font-size: 9px; font-weight: 600; color: var(--text-gray); background: #F8FAFC; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; }
+        .row-date { font-size: 10px; font-weight: 600; color: #94A3B8; }
         .row-amt { font-size: 13px; font-weight: 800; }
         .c-inc { color: var(--inc-color); } .c-exp { color: var(--exp-color); }
 
-        .alert-dot { width: 8px; height: 8px; background: #F59E0B; border-radius: 50%; display: inline-block; margin-left: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .alert-dot { display: inline-block; width: 6px; height: 6px; background: #F59E0B; border-radius: 50%; margin-left: 4px; vertical-align: middle; }
 
-        /* --- CHARTS & TOOLS (Footer) --- */
-        .section-title { padding: 0 20px; font-size: 14px; font-weight: 800; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; }
+        /* --- CHART & TOOLS --- */
+        .section-header { 
+            padding: 0 20px; margin-top: 25px; margin-bottom: 10px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
+        .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
         
-        .chart-container { 
-            background: var(--surface); margin: 0 15px; padding: 20px; 
-            border-radius: 16px; border: 1px solid var(--border); height: 220px;
+        .chart-box { 
+            background: var(--surface); margin: 0 15px; padding: 15px; 
+            border-radius: 16px; border: 1px solid var(--border); height: 260px; position: relative;
         }
 
-        .tools-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;
+        .action-btns { padding: 20px; display: flex; gap: 10px; }
+        .btn-big {
+            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+            background: white; color: var(--text-dark); font-weight: 700; font-size: 12px;
+            display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
         }
-        .btn-tool {
-            background: white; border: 1px solid var(--border); padding: 15px; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            font-size: 12px; font-weight: 600; color: var(--text-gray); cursor: pointer;
-        }
-        .btn-tool i { font-size: 20px; color: var(--primary); }
-        .btn-tool:active { background: #F1F5F9; border-color: var(--primary); }
 
         /* --- FAB & FORM --- */
         .fab { 
-            position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; 
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; 
             background: var(--text-dark); color: white; border-radius: 50%; border:none; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25); font-size: 24px; cursor: pointer; z-index: 40; 
-            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; cursor: pointer; z-index: 40; 
         }
         
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; display: none; backdrop-filter: blur(3px); }
         .sheet { 
             position: fixed; bottom: 0; width: 100%; background: white; z-index: 100;
-            border-radius: 20px 20px 0 0; transform: translateY(100%); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            padding: 25px 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+            border-radius: 20px 20px 0 0; transform: translateY(100%); transition: 0.3s;
+            padding: 25px 20px; max-height: 90vh; overflow-y: auto;
         }
         .sheet.open { transform: translateY(0); }
 
-        /* Form Elements */
-        .inp-grp { margin-bottom: 15px; }
-        .inp-lbl { font-size: 11px; font-weight: 700; color: var(--text-gray); margin-bottom: 5px; display: block; text-transform: uppercase; }
-        .inp { width: 100%; height: 45px; border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; font-size: 15px; background: #F8FAFC; font-family: inherit; }
+        .inp-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .inp-grp { flex: 1; }
+        .lbl { font-size: 11px; font-weight: 700; color: var(--text-gray); display: block; margin-bottom: 5px; text-transform: uppercase; }
+        .inp { width: 100%; height: 45px; border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #F8FAFC; font-size: 15px; }
         
-        .type-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
-        .t-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: white; font-weight: 600; font-size: 13px; color: var(--text-gray); }
-        .t-btn.active.inc { background: var(--inc-color); color: white; border-color: var(--inc-color); }
-        .t-btn.active.exp { background: var(--exp-color); color: white; border-color: var(--exp-color); }
-        
-        .btn-save { width: 100%; height: 50px; background: var(--text-dark); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin-top: 10px; }
-        .btn-del { width: 100%; padding: 15px; color: #EF4444; background: none; border: none; font-weight: 700; margin-top: 5px; }
+        .btn-save { width: 100%; height: 50px; background: var(--text-dark); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin-top: 15px; }
+        .sw-container { display: flex; background: #F1F5F9; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+        .sw-item { flex: 1; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-gray); border-radius: 8px; cursor: pointer; }
+        .sw-item.active.inc { background: var(--inc-color); color: white; }
+        .sw-item.active.exp { background: var(--exp-color); color: white; }
+
     </style>
 </head>
 <body>
@@ -159,13 +155,13 @@
 
 <header class="top-bar">
     <div class="brand">J&M</div>
-    <div class="date-cmd">
-        <button class="btn-cmd" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="date-label">
+    <div class="date-ctrl">
+        <button class="btn-arrow" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="date-display">
             <span id="monthTxt">...</span>
             <input type="month" id="dateInput" onchange="loadData()" style="position:absolute; inset:0; opacity:0; cursor:pointer;">
         </div>
-        <button class="btn-cmd" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="btn-arrow" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </header>
 
@@ -174,45 +170,40 @@
         <div class="kpi-label">Balance Neto</div>
         <div class="kpi-val" id="kpiBal">$0</div>
         <div class="kpi-sub">
-            <i class="fas fa-dollar-sign" style="font-size:12px;"></i>
-            <span id="kpiUsd">0.00</span>
-            <span style="color:#CBD5E1">|</span>
-            Blue: <input type="number" id="usdRate" value="1200" class="usd-edit" onchange="loadData()">
+            <span>USD <span id="kpiUsd" style="color:var(--text-dark); font-weight:800;">0.00</span></span>
+            <span style="color:#E2E8F0">|</span>
+            <span>TC Dolar: <input type="number" id="usdRate" value="1200" class="usd-edit" onchange="loadData()"></span>
         </div>
     </div>
 </div>
 
 <div class="t-grid">
     <div class="t-col">
-        <div class="col-header bg-inc">
-            Ingresos <br> <span class="col-total" id="sum-inc">$0</span>
-        </div>
+        <div class="col-header bg-inc">Ingresos<br><span class="col-total" id="sum-inc">$0</span></div>
         <div class="t-list" id="list-inc"></div>
     </div>
-    
     <div class="t-col">
-        <div class="col-header bg-exp">
-            Egresos <br> <span class="col-total" id="sum-exp">$0</span>
-        </div>
+        <div class="col-header bg-exp">Egresos<br><span class="col-total" id="sum-exp">$0</span></div>
         <div class="t-list" id="list-exp"></div>
     </div>
 </div>
 
-<div class="section-title">Distribución de Gastos</div>
-<div class="chart-container">
+<div class="section-header">
+    <span class="sec-title">Distribución</span>
+    <button id="chartReset" class="btn-reset-chart" onclick="resetChart()">
+        <i class="fas fa-arrow-left"></i> VOLVER A CATEGORÍAS
+    </button>
+</div>
+<div class="chart-box">
     <canvas id="myChart"></canvas>
+    <div id="chartCenterText" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#64748B; pointer-events:none; font-weight:600;">
+        Toca para detalle
+    </div>
 </div>
 
-<div class="section-title">Gestión de Datos</div>
-<div class="tools-container">
-    <button class="btn-tool" onclick="backup()">
-        <i class="fas fa-cloud-download-alt"></i>
-        <span>GUARDAR BACKUP</span>
-    </button>
-    <button class="btn-tool" onclick="document.getElementById('fileIn').click()">
-        <i class="fas fa-history"></i>
-        <span>RESTAURAR DATOS</span>
-    </button>
+<div class="action-btns">
+    <button class="btn-big" onclick="backup()"><i class="fas fa-download"></i> Backup</button>
+    <button class="btn-big" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar</button>
     <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
 </div>
 
@@ -225,49 +216,48 @@
     </div>
 
     <form id="txForm">
-        <div class="type-toggle">
-            <button type="button" class="t-btn" id="btn-exp" onclick="setType('exp')">Gasto</button>
-            <button type="button" class="t-btn" id="btn-inc" onclick="setType('inc')">Ingreso</button>
+        <div class="sw-container">
+            <div class="sw-item" id="sw-exp" onclick="setType('exp')">Gasto</div>
+            <div class="sw-item" id="sw-inc" onclick="setType('inc')">Ingreso</div>
         </div>
         <input type="hidden" id="fType" value="exp">
 
-        <div style="display:flex; gap:15px;">
-            <div class="inp-grp" style="flex:1">
-                <label class="inp-lbl">Monto</label>
+        <div class="inp-row">
+            <div class="inp-grp">
+                <label class="lbl">Monto</label>
                 <input type="number" id="fAmount" class="inp" placeholder="0.00" step="0.01" required>
             </div>
-            <div class="inp-grp" style="flex:1">
-                <label class="inp-lbl">Fecha</label>
+            <div class="inp-grp">
+                <label class="lbl">Fecha</label>
                 <input type="date" id="fDate" class="inp" required>
             </div>
         </div>
 
-        <div class="inp-grp">
-            <label class="inp-lbl">Categoría</label>
+        <div class="inp-grp" style="margin-bottom:15px;">
+            <label class="lbl">Categoría</label>
             <select id="fCat" class="inp" onchange="renderConcepts()" required></select>
         </div>
 
-        <div class="inp-grp">
-            <label class="inp-lbl">Concepto (Descripción)</label>
+        <div class="inp-grp" style="margin-bottom:15px;">
+            <label class="lbl">Concepto</label>
             <select id="fConcept" class="inp" onchange="checkNewConcept()" required></select>
-            <input type="text" id="fConceptCustom" class="inp" style="margin-top:10px; display:none;" placeholder="Escribe el nombre...">
+            <input type="text" id="fConceptCustom" class="inp" style="margin-top:10px; display:none;" placeholder="Nombre...">
         </div>
 
         <div style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
             <input type="checkbox" id="fExec" checked style="width:20px; height:20px;">
-            <label for="fExec" style="font-weight:600;">Ya se pagó / cobró</label>
+            <label for="fExec" style="font-weight:600; font-size:13px;">Consolidado (Pagado/Cobrado)</label>
         </div>
 
         <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
-        <button type="button" id="btnDel" class="btn-del" style="display:none;" onclick="del(editId)">Eliminar Transacción</button>
+        <button type="button" id="btnDel" onclick="del(editId)" style="width:100%; color:#EF4444; background:none; border:none; padding:15px; font-weight:700; display:none;">Eliminar</button>
     </form>
 </div>
 
 <script>
-    // --- DATA ---
     const defData = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] }, concepts: { "Esenciales": ["Alquiler", "Luz/Gas", "Supermercado"], "Deudas": ["Tarjeta Visa"], "Sueldo": ["Javier", "Mary"] } };
     let data = JSON.parse(localStorage.getItem('finData_v16')) || defData;
-    let editId = null, chartInstance = null;
+    let editId = null, chartInstance = null, currentTxs = [], currentChartFilter = null;
 
     window.onload = () => {
         const d = new Date();
@@ -277,26 +267,31 @@
         loadData();
     };
 
-    // --- NAVIGATION ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; setTimeout(resetForm,300); }
+    
+    // --- NAV MONTH FUNCIONAL ---
     function navMonth(n) { 
         const i = document.getElementById('dateInput'); let [y,m]=i.value.split('-'); 
-        i.value = new Date(y,m-1+n,1).toISOString().slice(0,7); loadData(); 
+        // Crear fecha segura usando dia 1 para evitar saltos de mes en dias 31
+        const newDate = new Date(parseInt(y), parseInt(m)-1+n, 1);
+        const newY = newDate.getFullYear();
+        const newM = String(newDate.getMonth() + 1).padStart(2, '0');
+        i.value = `${newY}-${newM}`;
+        loadData(); 
     }
 
-    // --- RENDER ENGINE ---
     function loadData() {
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
         
-        // ORDENAR: Más reciente arriba (Fecha DESC)
-        const currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => b.date.localeCompare(a.date));
+        // --- ORDENAMIENTO ASCENDENTE (1 arriba, 31 abajo) ---
+        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => a.date.localeCompare(b.date));
         
         renderLists(currentTxs);
-        renderChart(currentTxs);
+        resetChart(); // Reiniciar gráfico a vista general
         renderCats();
         localStorage.setItem('usdRate', document.getElementById('usdRate').value);
     }
@@ -311,24 +306,21 @@
             const amt = Math.abs(t.amount);
             if(isInc) tInc += amt; else tExp += amt;
 
-            // Alerta 5 días
-            let alertDot = '';
+            let alertHTML = '';
             if(!t.exec && !isInc) {
                 const diff = (new Date(t.date) - new Date(today)) / (86400000);
-                if(diff <= 5) alertDot = `<div class="alert-dot"></div>`;
+                if(diff <= 5) alertHTML = `<div class="alert-dot"></div>`;
             }
 
             const div = document.createElement('div');
             div.className = 'row-item';
             div.onclick = () => edit(t.id);
             div.innerHTML = `
-                <div class="row-top">
-                    <div class="row-desc">${t.desc} ${alertDot}</div>
-                    <div class="row-amt ${isInc?'c-inc':'c-exp'}">${isInc?'+':''}$${Math.floor(amt).toLocaleString()}</div>
-                </div>
-                <div class="row-bot">
-                    <div class="row-cat">${t.cat}</div>
-                    <div class="row-date">${t.date.split('-')[2]}/${t.date.split('-')[1]}</div>
+                <div class="row-main">${t.desc} ${alertHTML}</div>
+                <div class="row-sub">
+                    <span class="row-cat">${t.cat}</span>
+                    <span class="row-date">${t.date.split('-')[2]}</span>
+                    <span class="row-amt ${isInc?'c-inc':'c-exp'}">${isInc?'+':''}$${Math.floor(amt).toLocaleString()}</span>
                 </div>
             `;
             (isInc ? lInc : lExp).appendChild(div);
@@ -336,7 +328,6 @@
 
         document.getElementById('sum-inc').innerText = `$${tInc.toLocaleString()}`;
         document.getElementById('sum-exp').innerText = `$${tExp.toLocaleString()}`;
-        
         const bal = tInc - tExp;
         const balEl = document.getElementById('kpiBal');
         balEl.innerText = `$${bal.toLocaleString()}`;
@@ -346,11 +337,64 @@
         document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
     }
 
+    // --- CHART DRILL DOWN ---
+    function resetChart() { renderChart(currentTxs, null); }
+
+    function renderChart(txs, filterCat) {
+        const ctx = document.getElementById('myChart'); 
+        if(chartInstance) chartInstance.destroy();
+        
+        currentChartFilter = filterCat;
+        const btnReset = document.getElementById('chartReset');
+        const centerTxt = document.getElementById('chartCenterText');
+
+        // Solo Egresos
+        let exps = txs.filter(t => t.type === 'exp');
+        let map = {};
+
+        if (!filterCat) {
+            // Nivel 1: Categorías
+            btnReset.style.display = 'none';
+            centerTxt.innerText = "Toca para Detalle";
+            map = exps.reduce((a,t)=>{ a[t.cat]=(a[t.cat]||0)+t.amount; return a; }, {});
+        } else {
+            // Nivel 2: Conceptos (Drill Down)
+            btnReset.style.display = 'block';
+            centerTxt.innerText = filterCat;
+            map = exps.filter(t => t.cat === filterCat).reduce((a,t)=>{ a[t.desc]=(a[t.desc]||0)+t.amount; return a; }, {});
+        }
+
+        const labels = Object.keys(map);
+        const values = Object.values(map);
+
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: { 
+                labels: labels, 
+                datasets: [{ 
+                    data: values, 
+                    backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6366F1'],
+                    borderWidth: 2, borderColor: '#ffffff'
+                }] 
+            },
+            options: { 
+                responsive:true, maintainAspectRatio:false, cutout:'60%',
+                plugins: { legend: { display: false } },
+                onClick: (e, elements) => {
+                    if (elements.length > 0 && !filterCat) {
+                        const i = elements[0].index;
+                        renderChart(txs, labels[i]);
+                    }
+                }
+            }
+        });
+    }
+
     // --- FORM LOGIC ---
     function setType(t) {
         document.getElementById('fType').value = t;
-        document.getElementById('btn-inc').className = `t-btn ${t=='inc'?'active inc':''}`;
-        document.getElementById('btn-exp').className = `t-btn ${t=='exp'?'active exp':''}`;
+        document.getElementById('sw-inc').className = `sw-item ${t=='inc'?'active inc':''}`;
+        document.getElementById('sw-exp').className = `sw-item ${t=='exp'?'active exp':''}`;
         renderCats();
     }
     
@@ -418,23 +462,9 @@
         setType('exp'); 
     }
     
-    function del(id) { if(confirm('¿Borrar transacción?')) { data.txs=data.txs.filter(x=>x.id!=id); save(); closeSheet(); loadData(); } }
-
-    // --- CHARTS & BACKUP ---
-    function renderChart(txs) {
-        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
-        const exps = txs.filter(t=>t.type==='exp');
-        const map = exps.reduce((a,t)=>{ a[t.cat]=(a[t.cat]||0)+t.amount; return a; }, {});
-        
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: Object.keys(map), datasets: [{ label:'Gastos', data: Object.values(map), backgroundColor: '#2563EB', borderRadius:4 }] },
-            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:{display:false}}, x:{grid:{display:false}}} }
-        });
-    }
-
+    function del(id) { if(confirm('¿Borrar?')) { data.txs=data.txs.filter(x=>x.id!=id); save(); closeSheet(); loadData(); } }
     function save() { localStorage.setItem('finData_v16', JSON.stringify(data)); }
-    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`JM_Backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); }
+    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`JM_Backup.json`; a.click(); }
     function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{ try{data=JSON.parse(e.target.result); save(); location.reload();}catch(x){alert('Archivo incorrecto');} }; r.readAsText(i.files[0]); }
 </script>
 </body>
