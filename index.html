@@ -64,7 +64,7 @@
             background: var(--surface); padding: 20px; border-radius: 16px;
             border: 1px solid var(--border); text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-            container-type: inline-size; /* Clave para el ajuste automático */
+            container-type: inline-size;
         }
         .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         
@@ -318,7 +318,7 @@
 
 <script>
     // URL DE APPS SCRIPT
-    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcqrqsXj4zh93-qWly5i2R4jwvgJ8L25GcU3h3Bkh/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
 
     const defData = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] }, concepts: { "Esenciales": ["Alquiler", "Luz/Gas", "Supermercado"], "Deudas": ["Tarjeta Visa"], "Sueldo": ["Javier", "Mary"] } };
     let data = defData; // Iniciamos vacío hasta cargar de nube
@@ -354,7 +354,7 @@
         } catch(e) {
             console.error(e);
             status("OFFLINE", "error");
-            alert("Sin conexión. Verifica tu internet.");
+            alert("Modo Offline (Sin conexión)");
         }
         showLoad(false);
     }
@@ -374,17 +374,15 @@
         showLoad(false);
     }
 
-    // --- FUNCIONES INTERFAZ ---
+    // --- INTERFAZ ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; setTimeout(resetForm,300); }
     
     function navMonth(n) { 
-        const i = document.getElementById('dateInput'); 
-        let [y, m] = i.value.split('-'); 
-        const current = new Date(parseInt(y), parseInt(m)-1, 1);
-        current.setMonth(current.getMonth() + n);
-        const newY = current.getFullYear();
-        const newM = String(current.getMonth() + 1).padStart(2, '0');
+        const i = document.getElementById('dateInput'); let [y,m]=i.value.split('-'); 
+        const newDate = new Date(parseInt(y), parseInt(m)-1+n, 1);
+        const newY = newDate.getFullYear();
+        const newM = String(newDate.getMonth() + 1).padStart(2, '0');
         i.value = `${newY}-${newM}`;
         loadData(); 
     }
