@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V33.2 Pro</title>
+    <title>J&M Finanzas</title>
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="J&M Finanzas">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,17 +39,17 @@
             padding: 0 15px; border-bottom: 1px solid var(--border);
             position: sticky; top: 0; z-index: 50;
         }
-        .brand { font-weight: 900; color: var(--primary); font-size: 18px; }
+        .brand { font-weight: 900; color: var(--primary); font-size: 18px; display: flex; align-items: center; gap: 8px; }
         
         .date-ctrl { 
             display: flex; align-items: center; background: #F1F5F9; 
             border-radius: 8px; padding: 2px; border: 1px solid var(--border);
-            position: relative; /* Fix z-index issues */
+            position: relative;
         }
         .btn-arrow { 
             background: transparent; border: none; width: 36px; height: 32px;
             cursor: pointer; color: var(--text-dark); font-size: 14px; display: flex; align-items: center; justify-content: center;
-            z-index: 10; /* Ensure arrows are clickable */
+            z-index: 10;
         }
         .btn-arrow:active { background: #CBD5E1; border-radius: 6px; }
         
@@ -179,7 +186,9 @@
 <div class="overlay" id="overlay" onclick="closeSheet()"></div>
 
 <header class="top-bar">
-    <div class="brand">J&M</div>
+    <div class="brand">
+        <i class="fas fa-wallet" style="font-size:16px;"></i> J&M
+    </div>
     <div class="date-ctrl">
         <button class="btn-arrow" type="button" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
         <div class="date-display">
@@ -300,14 +309,10 @@
 
     window.onload = () => {
         const d = new Date();
-        // Forzar siempre al mes actual al cargar
         const currentYM = d.toISOString().slice(0, 7);
         document.getElementById('dateInput').value = currentYM;
-        
-        // Prepara la fecha del formulario de nuevo ingreso
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
         
-        // Prepara el "source picker" al mes anterior por defecto
         const prevM = new Date(d.getFullYear(), d.getMonth() - 1, 1);
         document.getElementById('copySourcePicker').value = prevM.toISOString().slice(0, 7);
 
@@ -318,20 +323,16 @@
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; setTimeout(resetForm,300); }
     
-    // --- NAVEGACION CORREGIDA ---
     function navMonth(n) { 
         const i = document.getElementById('dateInput'); 
         let [y, m] = i.value.split('-'); 
         
-        // Crear fecha segura usando valores enteros
         const current = new Date(parseInt(y), parseInt(m)-1, 1);
-        // Sumar/Restar meses
         current.setMonth(current.getMonth() + n);
         
         const newY = current.getFullYear();
         const newM = String(current.getMonth() + 1).padStart(2, '0');
         
-        // Asignar y cargar
         i.value = `${newY}-${newM}`;
         loadData(); 
     }
@@ -344,14 +345,11 @@
         
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => a.date.localeCompare(b.date));
         
-        // Mostrar zona de copiado si el mes está vacío
         const copyZone = document.getElementById('copyZone');
         if(currentTxs.length === 0) {
             copyZone.style.display = 'block';
-            // Poner por defecto en el picker el mes inmediatamente anterior al actual visible
             const visibleDate = new Date(parseInt(y), parseInt(m)-1, 1);
             const prev = new Date(visibleDate.getFullYear(), visibleDate.getMonth()-1, 1);
-            // Solo actualizamos si el usuario no ha tocado nada (opcional), aqui lo fuerzo para comodidad
             document.getElementById('copySourcePicker').value = prev.toISOString().slice(0,7);
         } else {
             copyZone.style.display = 'none';
@@ -363,10 +361,9 @@
         localStorage.setItem('usdRate', document.getElementById('usdRate').value);
     }
 
-    // --- NUEVA FUNCION DE COPIADO SELECCIONABLE ---
     function copyFromSelected() {
-        const targetYM = document.getElementById('dateInput').value; // Destino
-        const sourceYM = document.getElementById('copySourcePicker').value; // Origen
+        const targetYM = document.getElementById('dateInput').value; 
+        const sourceYM = document.getElementById('copySourcePicker').value; 
         
         if(!sourceYM) { alert('Selecciona un mes de origen'); return; }
         if(sourceYM === targetYM) { alert('No puedes copiar el mismo mes sobre sí mismo'); return; }
@@ -380,21 +377,20 @@
         
         if(!confirm(`Copiar ${sourceTxs.length} movimientos de ${sourceYM} a este mes?`)) return;
 
-        const [tY, tM] = targetYM.split('-').map(Number); // Target Year, Month (1-12)
+        const [tY, tM] = targetYM.split('-').map(Number); 
 
         sourceTxs.forEach(t => {
             const oldDay = parseInt(t.date.split('-')[2]);
-            // Logica para evitar overflow de dias (ej 31 feb)
             let newDateObj = new Date(tY, tM - 1, oldDay);
             if (newDateObj.getMonth() !== tM - 1) {
-                newDateObj = new Date(tY, tM, 0); // Ultimo dia del mes
+                newDateObj = new Date(tY, tM, 0); 
             }
             
             const newTx = {
                 ...t,
                 id: Date.now() + Math.random(),
                 date: newDateObj.toISOString().split('T')[0],
-                exec: false // Copia siempre como pendiente
+                exec: false 
             };
             data.txs.push(newTx);
         });
@@ -403,12 +399,10 @@
         loadData();
     }
 
-    // --- LIMPIAR MES ACTUAL (Boton oculto) ---
     function clearCurrentMonth() {
         const ym = document.getElementById('dateInput').value;
         if(!confirm(`⚠️ PELIGRO ⚠️\n\nEstás a punto de borrar TODOS los movimientos de: ${ym}.\n\n¿Estás seguro?`)) return;
         
-        // Filtramos para quedarnos con TODO lo que NO sea de este mes
         data.txs = data.txs.filter(t => !t.date.startsWith(ym));
         save();
         loadData();
