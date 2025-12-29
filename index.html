@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V33 Leyendas</title>
+    <title>J&M V33 Leyendas + Clonar</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -69,6 +69,19 @@
             border-radius: 4px; font-size: 12px; padding: 4px; color: var(--text-dark); font-weight: 700;
         }
 
+        /* --- COPY BTN ZONE --- */
+        .copy-zone {
+            padding: 0 15px; margin-bottom: 10px; display: none; /* Oculto por defecto */
+        }
+        .btn-copy-month {
+            width: 100%; background: var(--text-dark); color: white;
+            border: none; padding: 12px; border-radius: 12px;
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-copy-month:active { transform: scale(0.98); }
+
         /* --- T-VIEW --- */
         .t-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
@@ -77,6 +90,7 @@
         .t-col { 
             background: var(--surface); border-radius: 12px; 
             border: 1px solid var(--border); overflow: hidden;
+            min-height: 100px; /* Para que se vea algo si esta vacio */
         }
         .col-header { 
             padding: 8px; text-align: center; font-size: 11px; font-weight: 800; 
@@ -108,7 +122,6 @@
         .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
         .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
         
-        /* Aumenté height para que quepa la leyenda */
         .chart-box { 
             background: var(--surface); margin: 0 15px; padding: 15px; 
             border-radius: 16px; border: 1px solid var(--border); height: 320px; position: relative;
@@ -175,6 +188,12 @@
             <span>TC Dolar: <input type="number" id="usdRate" value="1200" class="usd-edit" onchange="loadData()"></span>
         </div>
     </div>
+</div>
+
+<div class="copy-zone" id="copyZone">
+    <button class="btn-copy-month" onclick="copyFromPrev()">
+        <i class="fas fa-copy"></i> COPIAR MOVIMIENTOS DEL MES ANTERIOR
+    </button>
 </div>
 
 <div class="t-grid">
@@ -287,10 +306,68 @@
         
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => a.date.localeCompare(b.date));
         
+        // --- LOGICA DE COPIADO ---
+        // Si no hay transacciones en este mes, mostrar boton copiar
+        const copyZone = document.getElementById('copyZone');
+        if(currentTxs.length === 0) {
+            copyZone.style.display = 'block';
+        } else {
+            copyZone.style.display = 'none';
+        }
+        
         renderLists(currentTxs);
         resetChart();
         renderCats();
         localStorage.setItem('usdRate', document.getElementById('usdRate').value);
+    }
+
+    // --- NUEVA FUNCION DE COPIADO ---
+    function copyFromPrev() {
+        const ym = document.getElementById('dateInput').value; // Año-Mes actual (Destino)
+        const [targetY, targetM] = ym.split('-').map(Number);
+        
+        // Calcular mes anterior
+        const prevDate = new Date(targetY, targetM - 2, 1); // -2 porque targetM es base 1, Date es base 0, y queremos el anterior
+        const prevY = prevDate.getFullYear();
+        const prevM = String(prevDate.getMonth() + 1).padStart(2, '0');
+        const prevYM = `${prevY}-${prevM}`;
+        
+        // Buscar txs del mes anterior
+        const prevTxs = data.txs.filter(t => t.date.startsWith(prevYM));
+        
+        if(prevTxs.length === 0) {
+            alert('El mes anterior (' + prevYM + ') no tiene movimientos para copiar.');
+            return;
+        }
+        
+        if(!confirm(`Se encontraron ${prevTxs.length} movimientos en el mes anterior. ¿Deseas copiarlos a este mes?`)) return;
+
+        // Copiar
+        prevTxs.forEach(t => {
+            const oldDay = parseInt(t.date.split('-')[2]);
+            // Crear nueva fecha manteniendo el día, pero en el mes actual
+            // Manejo basico de overflow (ej: 31 feb)
+            let newDateObj = new Date(targetY, targetM - 1, oldDay);
+            
+            // Si el mes cambió (ej: era 31 y cayó en 1 de marzo en vez de feb), ajustar al ultimo dia del mes
+            if (newDateObj.getMonth() !== targetM - 1) {
+                newDateObj = new Date(targetY, targetM, 0); // Ultimo dia del mes objetivo
+            }
+            
+            const newDateStr = newDateObj.toISOString().split('T')[0];
+
+            const newTx = {
+                ...t,
+                id: Date.now() + Math.random(), // Nuevo ID unico
+                date: newDateStr, // Nueva fecha
+                exec: false // IMPORTANTE: Se copian como NO pagados para revisión
+            };
+            data.txs.push(newTx);
+        });
+
+        save();
+        loadData();
+        alert('Movimientos copiados con éxito.');
     }
 
     function renderLists(txs) {
@@ -308,9 +385,12 @@
                 const diff = (new Date(t.date) - new Date(today)) / (86400000);
                 if(diff <= 5) alertHTML = `<div class="alert-dot"></div>`;
             }
+            // Agrego indicador visual si no es ejecutado (para las copias)
+            const opacityStyle = !t.exec ? 'opacity:0.7;' : '';
 
             const div = document.createElement('div');
             div.className = 'row-item';
+            div.style = opacityStyle;
             div.onclick = () => edit(t.id);
             div.innerHTML = `
                 <div class="row-main">${t.desc} ${alertHTML}</div>
@@ -373,7 +453,6 @@
             options: { 
                 responsive:true, maintainAspectRatio:false, cutout:'60%',
                 plugins: { 
-                    // LEYENDA ACTIVADA AQUÍ
                     legend: { 
                         display: true, 
                         position: 'bottom',
