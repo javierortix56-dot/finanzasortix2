@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M Finanzas</title>
+    <title>J&M Mobile Cloud</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="J&M Finanzas">
-    
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
 
@@ -33,14 +31,17 @@
             margin: 0; color: var(--text-dark); padding-bottom: 100px;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER & SYNC --- */
         .top-bar {
             background: var(--surface); height: 60px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 15px; border-bottom: 1px solid var(--border);
             position: sticky; top: 0; z-index: 50;
         }
-        .brand { font-weight: 900; color: var(--primary); font-size: 18px; display: flex; align-items: center; gap: 8px; }
-        
+        .brand { font-weight: 900; color: var(--primary); font-size: 18px; display: flex; flex-direction: column; line-height: 1; }
+        .sync-badge { font-size: 9px; font-weight: 700; background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 4px; margin-top: 2px; text-transform: uppercase; width: fit-content; }
+        .sync-badge.ok { background: #DCFCE7; color: #166534; }
+        .sync-badge.error { background: #FEE2E2; color: #991B1B; }
+
         .date-ctrl { 
             display: flex; align-items: center; background: #F1F5F9; 
             border-radius: 8px; padding: 2px; border: 1px solid var(--border);
@@ -48,8 +49,7 @@
         }
         .btn-arrow { 
             background: transparent; border: none; width: 36px; height: 32px;
-            cursor: pointer; color: var(--text-dark); font-size: 14px; display: flex; align-items: center; justify-content: center;
-            z-index: 10;
+            cursor: pointer; color: var(--text-dark); font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 10;
         }
         .btn-arrow:active { background: #CBD5E1; border-radius: 6px; }
         
@@ -58,15 +58,25 @@
             min-width: 90px; text-align: center; position: relative;
         }
 
-        /* --- BALANCE --- */
+        /* --- BALANCE (CON CORRECCIÓN DE TAMAÑO) --- */
         .kpi-wrapper { padding: 15px 15px 5px 15px; }
         .kpi-card {
             background: var(--surface); padding: 20px; border-radius: 16px;
             border: 1px solid var(--border); text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            container-type: inline-size; /* Clave para el ajuste automático */
         }
         .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .kpi-val { font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text-dark); line-height: 1.1; }
+        
+        .kpi-val { 
+            /* Fuente dinámica inteligente: se achica si el número es largo */
+            font-size: clamp(22px, 11cqw, 32px);
+            font-weight: 800; 
+            letter-spacing: -1px; 
+            color: var(--text-dark); 
+            line-height: 1.1; 
+            overflow-wrap: break-word;
+        }
         
         .kpi-sub { 
             margin-top: 10px; padding-top: 10px; border-top: 1px solid #F1F5F9;
@@ -143,15 +153,8 @@
             display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
             min-width: 45%;
         }
-        
-        .btn-danger-zone {
-            width: 100%; margin-top: 20px; text-align: center;
-        }
-        .btn-clear {
-            background: transparent; border: 1px solid #FECACA; color: #EF4444;
-            padding: 10px 20px; border-radius: 8px; font-size: 11px; font-weight: 700;
-            cursor: pointer;
-        }
+        .btn-danger-zone { width: 100%; margin-top: 20px; text-align: center; }
+        .btn-clear { background: transparent; border: 1px solid #FECACA; color: #EF4444; padding: 10px 20px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
 
         /* --- FAB & FORM --- */
         .fab { 
@@ -179,15 +182,26 @@
         .sw-item.active.inc { background: var(--inc-color); color: white; }
         .sw-item.active.exp { background: var(--exp-color); color: white; }
 
+        /* LOADING SPINNER */
+        .loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .spinner { width:40px; height:40px; border:4px solid #E2E8F0; border-top:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
     </style>
 </head>
 <body>
+
+<div id="loader" class="loader-overlay">
+    <div class="spinner"></div>
+    <div style="margin-top:15px; font-weight:700; font-size:14px; color:var(--text-gray);">Conectando con la Nube...</div>
+</div>
 
 <div class="overlay" id="overlay" onclick="closeSheet()"></div>
 
 <header class="top-bar">
     <div class="brand">
-        <i class="fas fa-wallet" style="font-size:16px;"></i> J&M
+        J&M 
+        <div id="syncBadge" class="sync-badge">Conectando...</div>
     </div>
     <div class="date-ctrl">
         <button class="btn-arrow" type="button" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
@@ -246,9 +260,9 @@
 </div>
 
 <div class="action-btns">
-    <button class="btn-big" onclick="backup()"><i class="fas fa-download"></i> Backup</button>
-    <button class="btn-big" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar</button>
-    <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
+    <div style="width:100%; text-align:center; margin-bottom:10px;">
+        <button onclick="forceSync()" style="background:none; border:1px solid #CBD5E1; padding:8px 15px; border-radius:20px; color:#64748B; font-weight:600; font-size:12px;"><i class="fas fa-sync"></i> Forzar Sincronización</button>
+    </div>
     
     <div class="btn-danger-zone">
         <button class="btn-clear" onclick="clearCurrentMonth()">⚠️ Limpiar Mes Actual</button>
@@ -303,8 +317,11 @@
 </div>
 
 <script>
+    // URL DE APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcqrqsXj4zh93-qWly5i2R4jwvgJ8L25GcU3h3Bkh/exec";
+
     const defData = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] }, concepts: { "Esenciales": ["Alquiler", "Luz/Gas", "Supermercado"], "Deudas": ["Tarjeta Visa"], "Sueldo": ["Javier", "Mary"] } };
-    let data = JSON.parse(localStorage.getItem('finData_v16')) || defData;
+    let data = defData; // Iniciamos vacío hasta cargar de nube
     let editId = null, chartInstance = null, currentTxs = [], currentChartFilter = null;
 
     window.onload = () => {
@@ -317,22 +334,57 @@
         document.getElementById('copySourcePicker').value = prevM.toISOString().slice(0, 7);
 
         if(localStorage.getItem('usdRate')) document.getElementById('usdRate').value = localStorage.getItem('usdRate');
-        loadData();
+        
+        forceSync(); // CARGA INICIAL
     };
 
+    // --- FUNCIONES NUBE ---
+    async function forceSync() {
+        showLoad(true, "Sincronizando...");
+        try {
+            const res = await fetch(API_URL);
+            const cloudData = await res.json();
+            if(cloudData && cloudData.txs) {
+                data = cloudData;
+                loadData();
+                status("EN LINEA", "ok");
+            } else {
+                status("NUEVO", "ok");
+            }
+        } catch(e) {
+            console.error(e);
+            status("OFFLINE", "error");
+            alert("Sin conexión. Verifica tu internet.");
+        }
+        showLoad(false);
+    }
+
+    async function saveData() {
+        showLoad(true, "Guardando...");
+        try {
+            localStorage.setItem('usdRate', document.getElementById('usdRate').value);
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+            status("GUARDADO", "ok");
+            closeSheet();
+            loadData();
+        } catch(e) {
+            alert("Error al guardar en la nube.");
+            status("ERROR", "error");
+        }
+        showLoad(false);
+    }
+
+    // --- FUNCIONES INTERFAZ ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; setTimeout(resetForm,300); }
     
     function navMonth(n) { 
         const i = document.getElementById('dateInput'); 
         let [y, m] = i.value.split('-'); 
-        
         const current = new Date(parseInt(y), parseInt(m)-1, 1);
         current.setMonth(current.getMonth() + n);
-        
         const newY = current.getFullYear();
         const newM = String(current.getMonth() + 1).padStart(2, '0');
-        
         i.value = `${newY}-${newM}`;
         loadData(); 
     }
@@ -365,26 +417,20 @@
         const targetYM = document.getElementById('dateInput').value; 
         const sourceYM = document.getElementById('copySourcePicker').value; 
         
-        if(!sourceYM) { alert('Selecciona un mes de origen'); return; }
-        if(sourceYM === targetYM) { alert('No puedes copiar el mismo mes sobre sí mismo'); return; }
+        if(!sourceYM) { alert('Selecciona origen'); return; }
+        if(sourceYM === targetYM) { alert('Mismo mes seleccionado'); return; }
 
         const sourceTxs = data.txs.filter(t => t.date.startsWith(sourceYM));
+        if(sourceTxs.length === 0) { alert('El mes origen está vacío.'); return; }
         
-        if(sourceTxs.length === 0) {
-            alert('El mes seleccionado (' + sourceYM + ') no tiene movimientos.');
-            return;
-        }
-        
-        if(!confirm(`Copiar ${sourceTxs.length} movimientos de ${sourceYM} a este mes?`)) return;
+        if(!confirm(`¿Copiar ${sourceTxs.length} movimientos?`)) return;
 
         const [tY, tM] = targetYM.split('-').map(Number); 
 
         sourceTxs.forEach(t => {
             const oldDay = parseInt(t.date.split('-')[2]);
             let newDateObj = new Date(tY, tM - 1, oldDay);
-            if (newDateObj.getMonth() !== tM - 1) {
-                newDateObj = new Date(tY, tM, 0); 
-            }
+            if (newDateObj.getMonth() !== tM - 1) newDateObj = new Date(tY, tM, 0); 
             
             const newTx = {
                 ...t,
@@ -395,18 +441,14 @@
             data.txs.push(newTx);
         });
 
-        save();
-        loadData();
+        saveData();
     }
 
     function clearCurrentMonth() {
         const ym = document.getElementById('dateInput').value;
-        if(!confirm(`⚠️ PELIGRO ⚠️\n\nEstás a punto de borrar TODOS los movimientos de: ${ym}.\n\n¿Estás seguro?`)) return;
-        
+        if(!confirm(`⚠️ ¿Borrar TODOS los movimientos de ${ym}?`)) return;
         data.txs = data.txs.filter(t => !t.date.startsWith(ym));
-        save();
-        loadData();
-        alert('Mes limpiado.');
+        saveData();
     }
 
     function renderLists(txs) {
@@ -491,16 +533,7 @@
             options: { 
                 responsive:true, maintainAspectRatio:false, cutout:'60%',
                 plugins: { 
-                    legend: { 
-                        display: true, 
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 10,
-                            font: { size: 10, family: 'Inter' },
-                            padding: 15,
-                            color: '#64748B'
-                        }
-                    } 
+                    legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10, family: 'Inter' }, padding: 15, color: '#64748B' } } 
                 },
                 onClick: (e, elements) => {
                     if (elements.length > 0 && !filterCat) {
@@ -530,7 +563,7 @@
         const cVal = document.getElementById('fCat').value;
         if(cVal==='new'){ 
             const n=prompt('Nueva Categoría:'); 
-            if(n){ data.cats[document.getElementById('fType').value].push(n); data.concepts[n]=[]; save(); renderCats(); document.getElementById('fCat').value=n; } 
+            if(n){ data.cats[document.getElementById('fType').value].push(n); data.concepts[n]=[]; saveData(); renderCats(); document.getElementById('fCat').value=n; } 
             else { renderCats(); return; }
         }
         const s = document.getElementById('fConcept'); s.innerHTML='';
@@ -555,7 +588,7 @@
         }
         const tx = { id:editId||Date.now(), date:document.getElementById('fDate').value, amount:parseFloat(document.getElementById('fAmount').value), type:document.getElementById('fType').value, cat, desc, exec:document.getElementById('fExec').checked };
         if(editId) { const i=data.txs.findIndex(x=>x.id==editId); if(i!==-1) data.txs[i]=tx; } else data.txs.push(tx);
-        save(); closeSheet(); loadData();
+        saveData(); closeSheet(); loadData();
     }
 
     function edit(id) {
@@ -583,10 +616,11 @@
         setType('exp'); 
     }
     
-    function del(id) { if(confirm('¿Borrar?')) { data.txs=data.txs.filter(x=>x.id!=id); save(); closeSheet(); loadData(); } }
-    function save() { localStorage.setItem('finData_v16', JSON.stringify(data)); }
-    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`JM_Backup.json`; a.click(); }
-    function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{ try{data=JSON.parse(e.target.result); save(); location.reload();}catch(x){alert('Archivo incorrecto');} }; r.readAsText(i.files[0]); }
+    function del(id) { if(confirm('¿Borrar?')) { data.txs=data.txs.filter(x=>x.id!=id); saveData(); closeSheet(); loadData(); } }
+    
+    // Utils
+    function showLoad(show, txt) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; if(txt) document.querySelector('#loader div:last-child').innerText = txt; }
+    function status(txt, cls) { const b = document.getElementById('syncBadge'); b.innerText = txt; b.className = `sync-badge ${cls}`; }
 </script>
 </body>
 </html>
