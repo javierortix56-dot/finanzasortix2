@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M Mobile Cloud V36.5</title>
+    <title>J&M Mobile Cloud V36.6</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -75,13 +75,14 @@
         .row-item.executed .desc-text { text-decoration: line-through; color: #94A3B8; }
         .row-item.executed .amt-text { text-decoration: line-through; opacity: 0.6; }
 
-        /* Subtotal TAG */
+        /* Subtotal TAGs */
         .subtotal-tag {
             font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px;
             display: inline-block; margin-top: 3px;
         }
-        .st-ok { background: #DCFCE7; color: #166534; }
-        .st-bad { background: #FEE2E2; color: #991B1B; }
+        .st-ok { background: #DCFCE7; color: #166534; } /* Para "Quedan" positivo */
+        .st-bad { background: #FEE2E2; color: #991B1B; } /* Para "Quedan" negativo */
+        .st-inc { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; } /* Nuevo: Para Ingresos */
         
         .row-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
 
@@ -247,40 +248,29 @@
         const [y, m] = ym.split('-');
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
-        // Filtrar por mes solamente. El ordenamiento lo hacemos en renderLists para el calculo.
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
         document.getElementById('copyZone').style.display = currentTxs.length === 0 ? 'block' : 'none';
         renderLists(currentTxs); resetChart(); renderCats();
     }
 
-    // --- CORAZÓN DE LA CORRECCIÓN: CALCULO CRONOLÓGICO ---
     function renderLists(txs) {
         const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
         lInc.innerHTML = ''; lExp.innerHTML = '';
         
         let tIncTotal=0, tExpTotal=0;
-
-        // 1. Preparamos una lista combinada para CALCULAR el flujo de caja día a día
-        // Clonamos para no alterar el original
-        let timeLine = [...txs];
         
-        // Ordenamos cronológicamente para simular la realidad
+        // 1. Timeline Global Cronológico
+        let timeLine = [...txs];
         timeLine.sort((a,b) => {
-            // Criterio 1: Fecha (Lo más antiguo primero)
             if (a.date !== b.date) return a.date.localeCompare(b.date);
-            // Criterio 2: Ingresos entran ANTES que Egresos en el mismo día
+            // IMPORTANTE: Primero Ingresos, luego Egresos en el mismo día
             if (a.type !== b.type) return a.type === 'inc' ? -1 : 1;
-            // Criterio 3 (Dentro de egresos): Ejecutados tienen prioridad de cálculo
             if (a.exec !== b.exec) return b.exec - a.exec;
-            // Criterio 4: Monto mayor primero (para consistencia visual)
             return Math.abs(b.amount) - Math.abs(a.amount);
         });
 
-        // 2. Simulamos el saldo
+        // 2. Cálculo de Saldo
         let runningBalance = 0;
-        
-        // Mapeamos para guardar el saldo resultante en cada transacción temporalmente
-        // Usamos un Map o propiedad temporal
         timeLine.forEach(t => {
             const amt = Math.abs(t.amount);
             if(t.type === 'inc') {
@@ -289,31 +279,27 @@
             } else {
                 runningBalance -= amt;
                 tExpTotal += amt;
-                // Guardamos el saldo "post-pago" en este objeto para mostrarlo luego
-                t._calculatedBal = runningBalance;
             }
+            // Guardamos el saldo resultante de ESTE movimiento
+            t._calculatedBal = runningBalance;
         });
 
-        // 3. Renderizamos las columnas
-        // Ahora sí, separamos para pintar.
-        // NOTA: Para que el balance tenga sentido visual, la lista de egresos DEBE respetar el orden cronológico que usamos para calcular.
+        // 3. Renderizado (Ahora SÍ mostramos el saldo en Ingresos)
         
-        let incs = txs.filter(t => t.type === 'inc').sort((a,b) => a.date.localeCompare(b.date));
-        
-        // Filtramos egresos y mantenemos el orden exacto del timeline (que ya incluye logica Fecha > Ejecutado > Monto)
+        // Filtramos Ingresos y Egresos manteniendo sus propiedades calculadas
+        let incs = timeLine.filter(t => t.type === 'inc');
         let exps = timeLine.filter(t => t.type === 'exp');
 
-        // Render Ingresos
         incs.forEach(t => {
-            lInc.appendChild(createRow(t, true, null));
+            // Renderizamos Ingreso CON saldo
+            lInc.appendChild(createRow(t, true, t._calculatedBal));
         });
 
-        // Render Egresos (Con el dato _calculatedBal que calculamos en el timeline)
         exps.forEach(t => {
+            // Renderizamos Egreso CON saldo
             lExp.appendChild(createRow(t, false, t._calculatedBal));
         });
 
-        // Actualizar Cabeceras y KPIs
         document.getElementById('sum-inc').innerText = `$${tIncTotal.toLocaleString()}`;
         document.getElementById('sum-exp').innerText = `$${tExpTotal.toLocaleString()}`;
         const bal = tIncTotal - tExpTotal;
@@ -330,8 +316,14 @@
         div.onclick = () => edit(t.id);
         
         let balHtml = '';
-        if (!isInc && balanceVal !== null) {
-             balHtml = `<span class="subtotal-tag ${balanceVal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(balanceVal).toLocaleString()}</span>`;
+        if (balanceVal !== null) {
+            if (isInc) {
+                // Estilo para Saldo en Ingresos (Muestra acumulación)
+                balHtml = `<span class="subtotal-tag st-inc">Disp: $${Math.floor(balanceVal).toLocaleString()}</span>`;
+            } else {
+                // Estilo para Saldo en Egresos (Muestra remanente)
+                balHtml = `<span class="subtotal-tag ${balanceVal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(balanceVal).toLocaleString()}</span>`;
+            }
         }
 
         const amt = Math.abs(t.amount);
