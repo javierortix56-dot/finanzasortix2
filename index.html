@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M Mobile Cloud V36.3</title>
+    <title>J&M Mobile Cloud V36.4</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -61,10 +61,9 @@
         .copy-controls { display: flex; gap: 8px; margin-top: 8px; }
         .btn-copy-month { flex: 1; background: var(--text-dark); color: white; border: none; padding: 0 12px; border-radius: 8px; font-weight: 700; font-size: 13px; height: 40px; }
 
-        /* --- LISTAS (SCROLL SECUNDARIO AGREGADO) --- */
+        /* --- LISTAS --- */
         .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; align-items: start; }
         .t-col { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
-        /* Fix Scroll: Definimos altura máxima para permitir scroll interno */
         .t-list { max-height: 60vh; overflow-y: auto; scrollbar-width: thin; }
         
         .col-header { padding: 8px; text-align: center; font-size: 11px; font-weight: 800; text-transform: uppercase; color: white; position: sticky; top: 0; z-index: 2; }
@@ -73,29 +72,29 @@
         
         .row-item { background: white; padding: 12px 8px; border-bottom: 1px solid #F1F5F9; position: relative; }
         
-        /* ESTILO TACHADO (EJECUTADO) */
         .row-item.executed .desc-text { text-decoration: line-through; color: #94A3B8; }
         .row-item.executed .amt-text { text-decoration: line-through; opacity: 0.6; }
 
+        /* Subtotal TAG reubicado para que no moleste */
         .subtotal-tag {
             font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px;
-            margin-left: 5px; display: inline-block;
+            display: inline-block; margin-top: 3px;
         }
         .st-ok { background: #DCFCE7; color: #166534; }
         .st-bad { background: #FEE2E2; color: #991B1B; }
+        
+        .row-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
 
         /* --- GRÁFICO --- */
         .section-header { padding: 0 20px; margin-top: 25px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
         .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
-        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 320px; position: relative; }
+        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 360px; position: relative; } /* Aumenté un poco la altura para la leyenda */
 
         /* --- BOTONES ACCIÓN --- */
         .action-btns { padding: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
         .btn-big { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: white; color: var(--text-dark); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 45%; }
         .btn-sync { width: 100%; margin-top: 5px; background: var(--primary); color: white; border: none; }
-        
-        /* BOTÓN BORRAR MES (Poco accesible) */
         .btn-danger-zone { margin-top: 20px; font-size: 10px; color: #CBD5E1; text-decoration: underline; background: none; border: none; }
 
         /* --- FORMULARIO --- */
@@ -105,20 +104,13 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; display: none; backdrop-filter: blur(3px); }
         
         .sw-container { display: flex; background: #F1F5F9; padding: 5px; border-radius: 12px; margin-bottom: 20px; gap: 5px; }
-        .sw-item { 
-            flex: 1; padding: 15px; text-align: center; font-size: 14px; font-weight: 700; 
-            border-radius: 10px; cursor: pointer; color: var(--text-gray); 
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            transition: 0.2s;
-        }
+        .sw-item { flex: 1; padding: 15px; text-align: center; font-size: 14px; font-weight: 700; border-radius: 10px; cursor: pointer; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; }
         .sw-item i { font-size: 18px; }
         .sw-item.active.exp { background: var(--exp-color); color: white; }
         .sw-item.active.inc { background: var(--inc-color); color: white; }
-
         .inp { width: 100%; height: 48px; border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #F8FAFC; margin-bottom: 12px; font-size: 16px; font-family: 'Inter'; }
         .lbl { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 5px; display: block; }
         .btn-save { width: 100%; height: 55px; background: var(--text-dark); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; }
-
         .loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; }
         .spinner { width:40px; height:40px; border:4px solid #E2E8F0; border-top:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
         @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
@@ -185,7 +177,6 @@
     <button class="btn-big" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar</button>
     <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
     <button class="btn-big btn-sync" onclick="forceSync()"><i class="fas fa-sync"></i> Sincronizar Nube</button>
-    
     <button class="btn-danger-zone" onclick="deleteCurrentMonth()">Eliminar datos del mes actual</button>
 </div>
 
@@ -203,22 +194,16 @@
             <div class="sw-item" id="sw-inc" onclick="setType('inc')"><i class="fas fa-plus-circle"></i> Ingreso</div>
         </div>
         <input type="hidden" id="fType" value="exp">
-
         <label class="lbl">Monto</label>
         <input type="number" id="fAmount" class="inp" placeholder="0.00" step="0.01" required>
-        
         <label class="lbl">Fecha</label>
         <input type="date" id="fDate" class="inp" required>
-        
         <label class="lbl">Categoría</label>
         <select id="fCat" class="inp" onchange="renderConcepts()" required></select>
-        
         <label class="lbl">Concepto</label>
         <select id="fConcept" class="inp" onchange="checkNewConcept()" required></select>
         <input type="text" id="fConceptCustom" class="inp" style="margin-top:5px; display:none;" placeholder="Nombre...">
-        
         <div style="margin:20px 0; display:flex; align-items:center; gap:10px;"><input type="checkbox" id="fExec" checked style="width:22px; height:22px;"> <label style="font-weight:700; font-size:14px;">Ejecutado (Consolidado)</label></div>
-        
         <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
         <button type="button" id="btnDel" onclick="del(editId)" style="width:100%; color:red; border:none; background:none; margin-top:15px; font-weight:800; display:none;">ELIMINAR</button>
     </form>
@@ -232,10 +217,8 @@
     window.onload = () => {
         const d = new Date();
         document.getElementById('dateInput').value = d.toISOString().slice(0, 7);
-        // Default source date for copy = previous month
         let prevM = new Date(); prevM.setMonth(prevM.getMonth()-1);
         document.getElementById('copySourcePicker').value = prevM.toISOString().slice(0, 7);
-        
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
         if(localStorage.getItem('usdRate')) document.getElementById('usdRate').value = localStorage.getItem('usdRate');
         forceSync();
@@ -250,7 +233,6 @@
         } catch(e) { status("ERROR NUBE", "error"); }
         showLoad(false);
     }
-
     async function saveData() {
         showLoad(true);
         try {
@@ -265,90 +247,51 @@
         const [y, m] = ym.split('-');
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
-        // Filtrar y Ordenar cronológicamente
-        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym)).sort((a,b) => a.date.localeCompare(b.date));
-        
+        // Filtrar por mes, pero NO ordenar por fecha aun.
+        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
         document.getElementById('copyZone').style.display = currentTxs.length === 0 ? 'block' : 'none';
-        
-        renderLists(currentTxs); 
-        resetChart(); 
-        renderCats();
+        renderLists(currentTxs); resetChart(); renderCats();
     }
 
-    // --- PUNTO 1: FUNCIÓN DE CLONADO RESTAURADA ---
-    function copyFromSelected() {
-        const sourceYM = document.getElementById('copySourcePicker').value;
-        const targetYM = document.getElementById('dateInput').value;
-        
-        if(!sourceYM || sourceYM === targetYM) return alert("Selecciona un mes origen distinto al actual");
-
-        const sourceTxs = (data.txs || []).filter(t => t.date.startsWith(sourceYM));
-        if(sourceTxs.length === 0) return alert("El mes origen no tiene datos");
-
-        const newTxs = sourceTxs.map(t => {
-            // Mantiene el día, cambia Año y Mes
-            const day = t.date.split('-')[2];
-            return {
-                ...t,
-                id: Date.now() + Math.random(), // Nuevo ID único
-                date: `${targetYM}-${day}`,
-                exec: false // Al clonar, nacen como NO ejecutados
-            };
-        });
-
-        data.txs = [...data.txs, ...newTxs];
-        saveData();
-    }
-
-    // --- PUNTO 3: BORRAR MES ---
-    function deleteCurrentMonth() {
-        const ym = document.getElementById('dateInput').value;
-        if(confirm(`ATENCIÓN: ¿Estás seguro de BORRAR TODOS los datos de ${ym}? Esta acción no se puede deshacer.`)) {
-            data.txs = data.txs.filter(t => !t.date.startsWith(ym));
-            saveData();
-        }
-    }
-
-    // --- PUNTO 6: LOGICA DE SUBTOTALES ACUMULADOS ---
     function renderLists(txs) {
         const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
         lInc.innerHTML = ''; lExp.innerHTML = '';
         
         let tInc=0, tExp=0;
         
-        // Calcular acumulados cronológicos globales para el subtotal
-        let runningBalance = 0;
-        // Ordenamos una copia global para calcular el saldo acumulado paso a paso
-        // Nota: currentTxs ya está filtrado por mes y ordenado por fecha
-        
-        txs.forEach((t, index) => {
-            const isInc = t.type === 'inc'; 
+        // Separamos en Ingresos y Egresos
+        let incs = txs.filter(t => t.type === 'inc');
+        let exps = txs.filter(t => t.type === 'exp');
+
+        // CALCULO DE TOTALES PARA VISUALIZACION
+        incs.forEach(t => tInc += Math.abs(t.amount));
+        exps.forEach(t => tExp += Math.abs(t.amount));
+
+        // ORDENAMIENTO DE INGRESOS (Cronológico standard)
+        incs.sort((a,b) => a.date.localeCompare(b.date));
+
+        // ORDENAMIENTO DE EGRESOS (Prioridad: Ejecutado -> Monto Descendente)
+        exps.sort((a,b) => {
+            // 1. Ejecutados primero (true > false)
+            if (a.exec !== b.exec) return b.exec - a.exec;
+            // 2. Monto descendente
+            return Math.abs(b.amount) - Math.abs(a.amount);
+        });
+
+        // RENDER INGRESOS (Sin Balances parciales)
+        incs.forEach(t => {
+            const div = createRow(t, true);
+            lInc.appendChild(div);
+        });
+
+        // RENDER EGRESOS (Con "Cuenta Regresiva" de Disponibilidad)
+        let availability = tInc; // Empezamos con el total de ingresos
+        exps.forEach(t => {
             const amt = Math.abs(t.amount);
+            availability -= amt; // Vamos restando
             
-            // Actualizar totales generales del mes
-            if(isInc) tInc += amt; else tExp += amt;
-
-            // --- PUNTO 6: Subtotal a la fecha (Neto) ---
-            // Recalculamos el saldo neto hasta este punto exacto en el tiempo
-            if(isInc) runningBalance += amt; else runningBalance -= amt;
-
-            const div = document.createElement('div');
-            // --- PUNTO 4: ESTILO TACHADO SI ES EJECUTADO ---
-            div.className = `row-item ${t.exec ? 'executed' : ''}`;
-            div.onclick = () => edit(t.id);
-            
-            // Lógica visual del subtotal
-            const subtotalHtml = `<span class="subtotal-tag ${runningBalance >= 0 ? 'st-ok' : 'st-bad'}">Bal: $${Math.floor(runningBalance)}</span>`;
-
-            div.innerHTML = `
-                <div class="desc-text" style="font-weight:800;font-size:13px">${t.desc}</div>
-                <div style="font-size:10px;color:gray;font-weight:700;">
-                    ${t.cat} | DÍA ${t.date.split('-')[2]} 
-                    ${subtotalHtml} 
-                    | <span class="amt-text ${isInc?'c-inc':'c-exp'}">$${Math.floor(amt).toLocaleString()}</span>
-                </div>`;
-            
-            (isInc ? lInc : lExp).appendChild(div);
+            const div = createRow(t, false, availability);
+            lExp.appendChild(div);
         });
 
         document.getElementById('sum-inc').innerText = `$${tInc.toLocaleString()}`;
@@ -359,6 +302,33 @@
         balEl.style.color = bal >= 0 ? '#10B981' : '#EF4444';
         const rate = parseFloat(document.getElementById('usdRate').value) || 1;
         document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
+    }
+
+    function createRow(t, isInc, currentBal = null) {
+        const div = document.createElement('div');
+        div.className = `row-item ${t.exec ? 'executed' : ''}`;
+        div.onclick = () => edit(t.id);
+        
+        // Logica para mostrar el balance solo en Egresos
+        let balHtml = '';
+        if (!isInc && currentBal !== null) {
+             balHtml = `<span class="subtotal-tag ${currentBal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(currentBal).toLocaleString()}</span>`;
+        }
+
+        const amt = Math.abs(t.amount);
+        div.innerHTML = `
+            <div class="desc-text" style="font-weight:800;font-size:13px">${t.desc}</div>
+            <div class="row-meta">
+                <div style="font-size:10px;color:gray;font-weight:700;">
+                    ${t.cat} | DÍA ${t.date.split('-')[2]}
+                </div>
+                <div style="font-size:12px; font-weight:800; text-align:right;">
+                    <span class="${isInc?'c-inc':'c-exp'}">$${Math.floor(amt).toLocaleString()}</span>
+                </div>
+            </div>
+            <div style="text-align:right;">${balHtml}</div>
+        `;
+        return div;
     }
 
     function renderChart(txs, filterCat) {
@@ -373,7 +343,6 @@
         btnReset.style.display = filterCat ? 'block' : 'none'; 
         centerTxt.innerText = filterCat || "Toca para detalle";
         
-        // --- PUNTO 5: GRÁFICO CON LEYENDA MEJORADA Y PORCENTAJES EN TOOLTIP ---
         chartInstance = new Chart(ctx, { 
             type: 'doughnut', 
             data: { 
@@ -390,21 +359,59 @@
                 maintainAspectRatio:false, 
                 cutout:'65%', 
                 plugins: { 
-                    legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, padding: 15 } },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                let value = context.raw || 0;
-                                let percentage = Math.round((value / totalVal) * 100) + '%';
-                                return `${label}: $${value} (${percentage})`;
+                    legend: { 
+                        display: true, 
+                        position: 'bottom', 
+                        labels: { 
+                            boxWidth: 10, 
+                            font: { size: 10 }, 
+                            padding: 10,
+                            // MODIFICACIÓN CLAVE: LEYENDA VISIBLE CON DATOS
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map((label, i) => {
+                                        const ds = data.datasets[0];
+                                        const val = ds.data[i];
+                                        const perc = totalVal > 0 ? Math.round((val / totalVal) * 100) : 0;
+                                        return {
+                                            text: `${label} ($${Math.floor(val).toLocaleString()} - ${perc}%)`,
+                                            fillStyle: ds.backgroundColor[i],
+                                            hidden: isNaN(ds.data[i]) || chart.getDatasetMeta(0).data[i].hidden,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
                             }
-                        }
-                    }
+                        } 
+                    },
+                    tooltip: { enabled: true } // Sigue activo por si quieren detalle fino
                 }, 
                 onClick: (e, el) => { if (el.length > 0 && !filterCat) renderChart(txs, Object.keys(map)[el[0].index]); } 
             } 
         });
+    }
+
+    function copyFromSelected() {
+        const sourceYM = document.getElementById('copySourcePicker').value;
+        const targetYM = document.getElementById('dateInput').value;
+        if(!sourceYM || sourceYM === targetYM) return alert("Selecciona un mes origen distinto al actual");
+        const sourceTxs = (data.txs || []).filter(t => t.date.startsWith(sourceYM));
+        if(sourceTxs.length === 0) return alert("El mes origen no tiene datos");
+        const newTxs = sourceTxs.map(t => {
+            const day = t.date.split('-')[2];
+            return { ...t, id: Date.now() + Math.random(), date: `${targetYM}-${day}`, exec: false };
+        });
+        data.txs = [...data.txs, ...newTxs];
+        saveData();
+    }
+    function deleteCurrentMonth() {
+        const ym = document.getElementById('dateInput').value;
+        if(confirm(`ATENCIÓN: ¿Borrar mes ${ym}?`)) {
+            data.txs = data.txs.filter(t => !t.date.startsWith(ym));
+            saveData();
+        }
     }
 
     function setType(t) { document.getElementById('fType').value = t; document.getElementById('sw-inc').className = `sw-item ${t=='inc'?'active inc':''}`; document.getElementById('sw-exp').className = `sw-item ${t=='exp'?'active exp':''}`; renderCats(); }
@@ -416,7 +423,6 @@
     function resetForm() { editId=null; document.getElementById('txForm').reset(); document.getElementById('fDate').value=new Date().toISOString().split('T')[0]; document.getElementById('btnDel').style.display='none'; setType('exp'); }
     function navMonth(n) { const i = document.getElementById('dateInput'); let [y,m]=i.value.split('-'); const d = new Date(y, m-1+n, 1); i.value = d.toISOString().slice(0,7); loadData(); }
     function resetChart() { renderChart(currentTxs, null); }
-
     document.getElementById('txForm').onsubmit = (e) => {
         e.preventDefault();
         let cat = document.getElementById('fCat').value, desc = document.getElementById('fConcept').value;
@@ -425,7 +431,6 @@
         if(editId) { const i=data.txs.findIndex(x=>x.id==editId); data.txs[i]=tx; } else { if(!data.txs) data.txs=[]; data.txs.push(tx); }
         saveData(); closeSheet();
     }
-
     function edit(id) {
         const t = data.txs.find(x=>x.id==id); editId=id; document.getElementById('fDate').value=t.date; document.getElementById('fAmount').value=Math.abs(t.amount); document.getElementById('fExec').checked=t.exec;
         setType(t.type); document.getElementById('fCat').value=t.cat; renderConcepts(); document.getElementById('fConcept').value=t.desc;
