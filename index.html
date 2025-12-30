@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M Mobile Cloud V36.4</title>
+    <title>J&M Mobile Cloud V36.5</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -75,7 +75,7 @@
         .row-item.executed .desc-text { text-decoration: line-through; color: #94A3B8; }
         .row-item.executed .amt-text { text-decoration: line-through; opacity: 0.6; }
 
-        /* Subtotal TAG reubicado para que no moleste */
+        /* Subtotal TAG */
         .subtotal-tag {
             font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px;
             display: inline-block; margin-top: 3px;
@@ -89,7 +89,7 @@
         .section-header { padding: 0 20px; margin-top: 25px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
         .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
-        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 360px; position: relative; } /* Aumenté un poco la altura para la leyenda */
+        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 360px; position: relative; }
 
         /* --- BOTONES ACCIÓN --- */
         .action-btns { padding: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
@@ -247,56 +247,76 @@
         const [y, m] = ym.split('-');
         const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
-        // Filtrar por mes, pero NO ordenar por fecha aun.
+        // Filtrar por mes solamente. El ordenamiento lo hacemos en renderLists para el calculo.
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
         document.getElementById('copyZone').style.display = currentTxs.length === 0 ? 'block' : 'none';
         renderLists(currentTxs); resetChart(); renderCats();
     }
 
+    // --- CORAZÓN DE LA CORRECCIÓN: CALCULO CRONOLÓGICO ---
     function renderLists(txs) {
         const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
         lInc.innerHTML = ''; lExp.innerHTML = '';
         
-        let tInc=0, tExp=0;
+        let tIncTotal=0, tExpTotal=0;
+
+        // 1. Preparamos una lista combinada para CALCULAR el flujo de caja día a día
+        // Clonamos para no alterar el original
+        let timeLine = [...txs];
         
-        // Separamos en Ingresos y Egresos
-        let incs = txs.filter(t => t.type === 'inc');
-        let exps = txs.filter(t => t.type === 'exp');
-
-        // CALCULO DE TOTALES PARA VISUALIZACION
-        incs.forEach(t => tInc += Math.abs(t.amount));
-        exps.forEach(t => tExp += Math.abs(t.amount));
-
-        // ORDENAMIENTO DE INGRESOS (Cronológico standard)
-        incs.sort((a,b) => a.date.localeCompare(b.date));
-
-        // ORDENAMIENTO DE EGRESOS (Prioridad: Ejecutado -> Monto Descendente)
-        exps.sort((a,b) => {
-            // 1. Ejecutados primero (true > false)
+        // Ordenamos cronológicamente para simular la realidad
+        timeLine.sort((a,b) => {
+            // Criterio 1: Fecha (Lo más antiguo primero)
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            // Criterio 2: Ingresos entran ANTES que Egresos en el mismo día
+            if (a.type !== b.type) return a.type === 'inc' ? -1 : 1;
+            // Criterio 3 (Dentro de egresos): Ejecutados tienen prioridad de cálculo
             if (a.exec !== b.exec) return b.exec - a.exec;
-            // 2. Monto descendente
+            // Criterio 4: Monto mayor primero (para consistencia visual)
             return Math.abs(b.amount) - Math.abs(a.amount);
         });
 
-        // RENDER INGRESOS (Sin Balances parciales)
-        incs.forEach(t => {
-            const div = createRow(t, true);
-            lInc.appendChild(div);
-        });
-
-        // RENDER EGRESOS (Con "Cuenta Regresiva" de Disponibilidad)
-        let availability = tInc; // Empezamos con el total de ingresos
-        exps.forEach(t => {
+        // 2. Simulamos el saldo
+        let runningBalance = 0;
+        
+        // Mapeamos para guardar el saldo resultante en cada transacción temporalmente
+        // Usamos un Map o propiedad temporal
+        timeLine.forEach(t => {
             const amt = Math.abs(t.amount);
-            availability -= amt; // Vamos restando
-            
-            const div = createRow(t, false, availability);
-            lExp.appendChild(div);
+            if(t.type === 'inc') {
+                runningBalance += amt;
+                tIncTotal += amt;
+            } else {
+                runningBalance -= amt;
+                tExpTotal += amt;
+                // Guardamos el saldo "post-pago" en este objeto para mostrarlo luego
+                t._calculatedBal = runningBalance;
+            }
         });
 
-        document.getElementById('sum-inc').innerText = `$${tInc.toLocaleString()}`;
-        document.getElementById('sum-exp').innerText = `$${tExp.toLocaleString()}`;
-        const bal = tInc - tExp;
+        // 3. Renderizamos las columnas
+        // Ahora sí, separamos para pintar.
+        // NOTA: Para que el balance tenga sentido visual, la lista de egresos DEBE respetar el orden cronológico que usamos para calcular.
+        
+        let incs = txs.filter(t => t.type === 'inc').sort((a,b) => a.date.localeCompare(b.date));
+        
+        // Filtramos egresos y mantenemos el orden exacto del timeline (que ya incluye logica Fecha > Ejecutado > Monto)
+        let exps = timeLine.filter(t => t.type === 'exp');
+
+        // Render Ingresos
+        incs.forEach(t => {
+            lInc.appendChild(createRow(t, true, null));
+        });
+
+        // Render Egresos (Con el dato _calculatedBal que calculamos en el timeline)
+        exps.forEach(t => {
+            lExp.appendChild(createRow(t, false, t._calculatedBal));
+        });
+
+        // Actualizar Cabeceras y KPIs
+        document.getElementById('sum-inc').innerText = `$${tIncTotal.toLocaleString()}`;
+        document.getElementById('sum-exp').innerText = `$${tExpTotal.toLocaleString()}`;
+        const bal = tIncTotal - tExpTotal;
         const balEl = document.getElementById('kpiBal');
         balEl.innerText = `$${bal.toLocaleString()}`;
         balEl.style.color = bal >= 0 ? '#10B981' : '#EF4444';
@@ -304,15 +324,14 @@
         document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
     }
 
-    function createRow(t, isInc, currentBal = null) {
+    function createRow(t, isInc, balanceVal) {
         const div = document.createElement('div');
         div.className = `row-item ${t.exec ? 'executed' : ''}`;
         div.onclick = () => edit(t.id);
         
-        // Logica para mostrar el balance solo en Egresos
         let balHtml = '';
-        if (!isInc && currentBal !== null) {
-             balHtml = `<span class="subtotal-tag ${currentBal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(currentBal).toLocaleString()}</span>`;
+        if (!isInc && balanceVal !== null) {
+             balHtml = `<span class="subtotal-tag ${balanceVal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(balanceVal).toLocaleString()}</span>`;
         }
 
         const amt = Math.abs(t.amount);
@@ -360,13 +379,9 @@
                 cutout:'65%', 
                 plugins: { 
                     legend: { 
-                        display: true, 
-                        position: 'bottom', 
+                        display: true, position: 'bottom', 
                         labels: { 
-                            boxWidth: 10, 
-                            font: { size: 10 }, 
-                            padding: 10,
-                            // MODIFICACIÓN CLAVE: LEYENDA VISIBLE CON DATOS
+                            boxWidth: 10, font: { size: 10 }, padding: 10,
                             generateLabels: function(chart) {
                                 const data = chart.data;
                                 if (data.labels.length && data.datasets.length) {
@@ -386,7 +401,7 @@
                             }
                         } 
                     },
-                    tooltip: { enabled: true } // Sigue activo por si quieren detalle fino
+                    tooltip: { enabled: true }
                 }, 
                 onClick: (e, el) => { if (el.length > 0 && !filterCat) renderChart(txs, Object.keys(map)[el[0].index]); } 
             } 
